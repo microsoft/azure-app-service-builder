@@ -20,9 +20,9 @@ The product is prelaunch. Product-specific documentation, portal entry points, a
 
 These forms become available after they are merged into the default branch. This repository is currently private; external customer intake also requires an approved change to public visibility. That publication decision is separate from this setup.
 
-## Resources and roadmap
+## Resources
 
-[Roadmap guidance](ROADMAP.md) describes how curated customer-outcome issues are tracked in the [Azure App Service Builder roadmap Project](https://github.com/orgs/microsoft/projects/2525), using separate work status and release stage fields. The repository and Project are currently private, and the Project is empty; customer-facing publication requires separate approval. No roadmap outcomes, dates, or availability commitments are populated. See [contribution guidance](CONTRIBUTING.md) for feedback and documentation contributions, and the [portal feedback integration guide](docs/portal-feedback-integration.md) for the GitHub handoff.
+See [contribution guidance](CONTRIBUTING.md) for feedback and documentation contributions, and the [portal feedback integration guide](docs/portal-feedback-integration.md) for the GitHub handoff.
 
 The following are **related Azure resources**, not product-specific Azure App Service Builder instructions or promises of supported features:
 

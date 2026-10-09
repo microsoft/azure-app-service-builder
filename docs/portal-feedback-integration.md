@@ -22,9 +22,9 @@ Template files live in `.github/ISSUE_TEMPLATE/`. Keep filenames and field IDs s
 | Feature request | `02-feature-request.yml` | `enhancement`, `needs-triage` |
 | Bug report | `03-bug-report.yml` | `bug`, `needs-triage` |
 
-`feedback` means general product input; `needs-triage` means awaiting initial maintainer review. `bug` and `enhancement` are the existing category labels. The separate `roadmap` label is reserved for maintainer-curated customer outcomes and is never applied by customer intake.
+`feedback` means general product input; `needs-triage` means awaiting initial maintainer review. `bug` and `enhancement` are the existing category labels.
 
-Ensure these labels exist in the destination repository; names in a YAML form do not create labels. This setup adds only the missing `feedback`, `needs-triage`, and `roadmap` labels and preserves existing labels.
+Ensure these labels exist in the destination repository; names in a YAML form do not create labels. The intake setup adds the missing `feedback` and `needs-triage` labels and preserves existing category labels.
 
 ## Browser entry points and URL prefill
 
@@ -107,4 +107,4 @@ Backend-created issues are authored by the authenticated API actor, not automati
 
 Public GitHub submission consent is distinct from permission to contact someone privately. The GitHub forms deliberately collect no email, account, or contact information. If the portal separately offers a private contact field and permission, keep both out of GitHub titles, bodies, comments, attachments, and URL parameters; do not add them to these forms. That private flow and its consent handling are outside this handoff.
 
-Use [support guidance](../SUPPORT.md) for service or account support and [SECURITY.md](../SECURITY.md) for private vulnerability reporting. The [roadmap scaffold](../ROADMAP.md) is maintainer-curated, not a portal submission category or a promise to implement incoming requests.
+Use [support guidance](../SUPPORT.md) for service or account support and [SECURITY.md](../SECURITY.md) for private vulnerability reporting. Feedback submission is not a promise to implement incoming requests.
