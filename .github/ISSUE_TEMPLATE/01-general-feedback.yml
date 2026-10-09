@@ -1,0 +1,48 @@
+name: General feedback
+description: Share a product experience, suggestion, or general question.
+labels:
+  - feedback
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feedback is welcome across Azure App Service Builder, not just the portal.
+        [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first. Add a reaction to an existing issue when it captures your feedback.
+        Treat your title, responses, comments, and attachments as public. Do not share email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics.
+        For account-specific or urgent problems, use [Azure support options](https://azure.microsoft.com/support/options/). Report vulnerabilities privately using [Microsoft's security guidance](https://aka.ms/SECURITY.md), not this form.
+  - type: textarea
+    id: details
+    attributes:
+      label: Feedback details
+      description: What would you like us to know? Describe the experience or question and its impact.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Product area
+      description: Optional context; these areas do not imply available or supported capabilities.
+      options:
+        - Portal
+        - CLI
+        - Build or deployment
+        - Running applications
+        - Documentation
+        - Other or unsure
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Optional background, how the experience felt, or what would improve it. Keep examples sanitized.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Public sharing acknowledgement
+      options:
+        - label: I understand that this submission is intended for public sharing, and I have removed personal, sensitive, and confidential information. This is not a security vulnerability report.
+          required: true

@@ -1,14 +1,35 @@
-# Project
+# Azure App Service Builder
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+This repository is the customer resource and product feedback hub for Azure App Service Builder. Feedback can cover the whole product, not just the portal. This is not the product source code repository or a replacement for Azure Support.
 
-As the maintainer of this project, please make a few updates:
+The product is prelaunch. Product-specific documentation, portal entry points, and samples will be linked here when they are published. This hub does not announce product availability or supported capabilities.
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+## Share feedback
+
+[Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) before opening a new one. Use a reaction on an existing issue to show that it matters to you, and add a comment when you have new context.
+
+| What you want to share | Where to start |
+| --- | --- |
+| An experience, suggestion, or general product question | [General feedback](https://github.com/microsoft/azure-app-service-builder/issues/new?template=01-general-feedback.yml) |
+| A customer problem and a desired new capability | [Feature request](https://github.com/microsoft/azure-app-service-builder/issues/new?template=02-feature-request.yml) |
+| Something that did not behave as expected | [Bug report](https://github.com/microsoft/azure-app-service-builder/issues/new?template=03-bug-report.yml) |
+| An account-specific problem or an urgent service issue | [Support guidance](SUPPORT.md) |
+| A suspected security vulnerability | [Security policy and private reporting](SECURITY.md) |
+
+**Treat issue titles, descriptions, comments, and attachments as public.** Do not include email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics. Report vulnerabilities privately, not in GitHub Issues.
+
+These forms become available after they are merged into the default branch. This repository is currently private; external customer intake also requires an approved change to public visibility. That publication decision is separate from this setup.
+
+## Resources and roadmap
+
+[The public roadmap approach](ROADMAP.md) describes how customer-facing outcomes can be curated separately from incoming feedback. There are no approved roadmap items published here yet. See [contribution guidance](CONTRIBUTING.md) for feedback and documentation contributions, and the [portal feedback integration guide](docs/portal-feedback-integration.md) for the GitHub handoff.
+
+The following are **related Azure resources**, not product-specific Azure App Service Builder instructions or promises of supported features:
+
+- [Azure App Service documentation](https://learn.microsoft.com/azure/app-service/)
+- [Azure documentation](https://learn.microsoft.com/azure/)
+- [Azure support options](https://azure.microsoft.com/support/options/)
+- [Azure status](https://azure.status.microsoft/)
 
 ## Contributing
 

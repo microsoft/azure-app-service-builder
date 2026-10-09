@@ -1,25 +1,19 @@
-# TODO: The maintainer of this repo has not yet edited this file
-
-**REPO OWNER**: Do you want Customer Service & Support (CSS) support for this product/project?
-
-- **No CSS support:** Fill out this template with information about how to file issues and get help.
-- **Yes CSS support:** Fill out an intake form at [aka.ms/onboardsupport](https://aka.ms/onboardsupport). CSS will work with/help you to determine next steps.
-- **Not sure?** Fill out an intake as though the answer were "Yes". CSS will help you decide.
-
-*Then remove this first heading from this SUPPORT.MD file before publishing your repo.*
-
 # Support
 
-## How to file issues and get help  
+## Product feedback and questions
 
-This project uses GitHub Issues to track bugs and feature requests. Please search the existing 
-issues before filing new issues to avoid duplicates.  For new issues, file your bug or 
-feature request as a new Issue.
+Use [GitHub Issues](https://github.com/microsoft/azure-app-service-builder/issues) for general product feedback, feature requests, reproducible bugs, and questions that can be discussed publicly. Feedback is welcome across the product, including experiences outside the portal. [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first, then select the appropriate [feedback form](https://github.com/microsoft/azure-app-service-builder/issues/new/choose).
 
-For help and questions about using this project, please **REPO MAINTAINER: INSERT INSTRUCTIONS HERE 
-FOR HOW TO ENGAGE REPO OWNERS OR COMMUNITY FOR HELP. COULD BE A STACK OVERFLOW TAG OR OTHER
-CHANNEL. WHERE WILL YOU HELP PEOPLE?**.
+The product is prelaunch, and product-specific help resources will be added when published. The repository remains private until a separate publication decision; external customers cannot use its intake until access is available.
 
-## Microsoft Support Policy  
+## Azure service and account support
 
-Support for this **PROJECT or PRODUCT** is limited to the resources listed above.
+For urgent service problems, billing, account access, or troubleshooting that needs confidential information, use [Azure support options](https://azure.microsoft.com/support/options/). Consult [Azure status](https://azure.status.microsoft/) for published service incidents.
+
+This repository is not an Azure support channel, and opening an issue does not create an Azure support request. Azure support eligibility depends on the service and your support arrangements; this hub does not establish product support coverage, a response-time guarantee, or an SLA.
+
+## Security and privacy
+
+Do not report suspected vulnerabilities in an issue or comment. Follow [SECURITY.md](SECURITY.md) and [Microsoft's private security reporting guidance](https://aka.ms/SECURITY.md).
+
+Treat everything submitted to GitHub as public, including titles and attachments. Do not post email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics. Use minimal, sanitized examples instead. If sensitive information is posted accidentally, stop sharing it, revoke exposed credentials where applicable, and contact the appropriate private support or security channel. Editing a post does not guarantee removal from its history or copies.

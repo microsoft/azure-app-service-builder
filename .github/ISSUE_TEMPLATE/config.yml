@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Azure support
+    url: https://azure.microsoft.com/support/options/
+    about: Use official Azure support options for urgent service problems or account-specific help.
+  - name: Private security reporting
+    url: https://aka.ms/SECURITY.md
+    about: Follow Microsoft's guidance to report suspected vulnerabilities privately, not in GitHub Issues.
