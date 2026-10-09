@@ -1,0 +1,55 @@
+name: Feature request
+description: Describe a customer problem and a desired product outcome.
+labels:
+  - enhancement
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Requests are welcome across Azure App Service Builder. A request is not a roadmap commitment.
+        [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first. Add a reaction or a new use case to a relevant existing request.
+        Treat your title, responses, comments, and attachments as public. Do not share email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics.
+        For account-specific or urgent problems, use [Azure support options](https://azure.microsoft.com/support/options/). Report vulnerabilities privately using [Microsoft's security guidance](https://aka.ms/SECURITY.md), not this form.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Customer problem
+      description: Describe the problem or use case, who it affects without identifying individuals, and why it matters.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: What would a useful solution let you accomplish?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Product area
+      description: Optional context; these areas do not imply available or supported capabilities.
+      options:
+        - Portal
+        - CLI
+        - Build or deployment
+        - Running applications
+        - Documentation
+        - Other or unsure
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional workarounds or other approaches, and why they do not meet your needs.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Public sharing acknowledgement
+      options:
+        - label: I understand that this submission is intended for public sharing, and I have removed personal, sensitive, and confidential information. This is not a security vulnerability report.
+          required: true
