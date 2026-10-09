@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Feedback is welcome across Azure App Service Builder, not just the portal.
+        Feedback is welcome across Azure App Service Builder.
         [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first. Add a reaction to an existing issue when it captures your feedback.
         Treat your title, responses, comments, and attachments as public. Do not share email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics.
         For account-specific or urgent problems, use [Azure support options](https://azure.microsoft.com/support/options/). Report vulnerabilities privately using [Microsoft's security guidance](https://aka.ms/SECURITY.md), not this form.
