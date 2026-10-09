@@ -8,11 +8,23 @@ No launch date, release scope, supported capability, or delivery commitment is i
 
 ## How to participate
 
-Share a customer problem through the [feature request form](https://github.com/microsoft/azure-app-service-builder/issues/new?template=02-feature-request.yml) or use [general feedback](https://github.com/microsoft/azure-app-service-builder/issues/new?template=01-general-feedback.yml). Search first and react to relevant existing issues. Customers do not need to assign a roadmap label or status.
+Share a customer problem through the [feature request form](https://github.com/microsoft/azure-app-service-builder/issues/new?template=02-feature-request.yml), use [general feedback](https://github.com/microsoft/azure-app-service-builder/issues/new?template=01-general-feedback.yml), or submit a [bug report](https://github.com/microsoft/azure-app-service-builder/issues/new?template=03-bug-report.yml). Search first and react to relevant existing issues. Customers create ordinary feedback issues and, when they have access, can read, comment, react, and subscribe to official roadmap issues.
 
-Maintainers may consolidate related feedback into a high-level outcome, author a separate issue in this repository labeled `roadmap`, and manually add it to the Project after its customer-facing wording is approved. [Browse roadmap issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue%20label%3Aroadmap), including closed issues.
+Designated maintainers consolidate related feedback into a high-level outcome and create a new, team-authored canonical issue in this same repository using an authorized maintainer's GitHub account. They link the original customer feedback, apply `roadmap`, and manually add the canonical issue to the Project after its customer-facing wording is approved. [Browse roadmap issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue%20label%3Aroadmap), including closed issues.
 
-Raw feedback and private engineering tasks are not automatically added, mirrored, or published. Repository association does not import issues. Only maintainers curate roadmap issues and set the Project fields; customers continue to use the feedback forms.
+Do not promote a customer-authored issue into the official roadmap by relabeling it or adding it to the Project: its original author retains title/body editing rights. Keep that feedback issue separate and link it from the maintainer-authored canonical issue instead.
+
+Raw feedback and private engineering tasks are not automatically added, mirrored, or published. Repository association does not import issues. Designated maintainers curate official roadmap issues and set the Project fields; customers continue to use the feedback forms.
+
+## Authorship and permissions
+
+This is a one-repository model: ordinary customer feedback and team-authored official roadmap issues live in this repository. Designated maintainers manage official issue titles, bodies, and labels under repository permissions. Issue authorship also matters: labeling or moving an issue does not remove its author's editing rights. Repository users with sufficient permissions, and normal organization/admin authority, retain their GitHub rights.
+
+Project inclusion, Status, and Release stage are controlled by separate Project permissions. Ordinary issue creation, reading, commenting, reactions, or subscriptions do not grant Project write access or let a customer self-publish an item onto the curated board.
+
+GitHub does not provide per-label or per-template author ACLs for this model. The `roadmap` label, an issue title, and the form chooser are not permission boundaries; an ordinary issue does not become official merely by naming it a roadmap item.
+
+**The initial maintainer is selected, but editing access is not yet locked down.** This setup has not changed repository or Project permissions, and existing direct, team, and inherited grants still apply. Before publication, authorized repository and Project administrators must apply the approved maintainer roster and review repository access and Project base/collaborator roles separately. Selecting a maintainer or being able to edit a Project does not establish authority to manage access. This documents the intended governance, not a claim that only the selected maintainer can currently edit.
 
 ## Work status
 
@@ -54,7 +66,7 @@ The Project has no automation workflows. There is no automatic issue import, pri
 
 ## Maintainer-authored item structure
 
-This structure is for maintainers, not another customer intake form. Author an issue only after the outcome and its customer-facing wording are approved. Apply `roadmap`, use a concise customer-outcome title, and keep the body at customer level:
+This structure stays here, outside the customer Issue Form chooser. A designated maintainer authors a new canonical issue only after the outcome and its customer-facing wording are approved; do not reuse a customer-authored issue. Apply `roadmap`, use a concise customer-outcome title, and keep the body at customer level:
 
 ```markdown
 ### Customer outcome
@@ -76,7 +88,8 @@ Link published public resources or an approved public availability statement.
 If availability is not established, say so; do not infer it from Done or closure.
 
 ### Related feedback
-Link relevant public feedback only; omit private issues and internal links.
+Link the original customer feedback issues without replacing them.
+Include public feedback only; omit private issues and internal links.
 
 ### Latest update
 Record the date and a brief public explanation of the current direction.

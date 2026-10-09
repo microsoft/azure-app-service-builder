@@ -16,7 +16,13 @@ New feedback is marked `needs-triage`. Maintainers review its category, clarify 
 
 Triage is not a delivery commitment or a response-time promise. An issue may remain open for discussion, be linked to an existing issue, or be closed with an explanation. Reactions help describe interest but do not determine priority on their own.
 
-The [roadmap](ROADMAP.md) is a separate, curated view of customer outcomes, not every incoming request or private engineering task. Only maintainers designate roadmap items and their status. Customers should use the three feedback forms rather than assign roadmap status.
+The [roadmap](ROADMAP.md) is a separate, curated view of customer outcomes within this same repository, not every incoming request or private engineering task. Customers use the three ordinary feedback forms and, when they have access, can read, comment, react, and subscribe to official roadmap issues.
+
+Official roadmap issues are new, team-authored canonical issues created through an authorized designated maintainer's GitHub account and linked to the original customer feedback. Do not promote a customer-authored issue into an official roadmap issue: its author retains title/body editing rights. The reusable maintainer structure stays in ROADMAP.md, outside the customer form chooser.
+
+Designated maintainers manage official issue titles, bodies, and labels under repository permissions, and Project membership, Status, and Release stage under separate Project permissions. Ordinary customer issue creation does not grant Project write access or self-publication onto the curated board. Labels and templates do not provide per-label or per-template author ACLs.
+
+The initial maintainer is selected, but editing access is not yet locked down; existing grants and normal organization/admin authority still apply. See [roadmap authorship and permissions](ROADMAP.md#authorship-and-permissions) for the administrator-assisted access review before publication; this setup has not changed permissions.
 
 ## Resource and documentation changes
 
