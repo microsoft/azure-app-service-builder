@@ -1,6 +1,6 @@
 # Azure App Service Builder
 
-This repository is the customer resource and product feedback hub for Azure App Service Builder. Feedback can cover the whole product, not just the portal. This is not the product source code repository or a replacement for Azure Support.
+This repository is the customer resource and product feedback hub for Azure App Service Builder. Feedback can cover the whole product. This is not the product source code repository or a replacement for Azure Support.
 
 The product is prelaunch. Product-specific documentation, portal entry points, and samples will be linked here when they are published. This hub does not announce product availability or supported capabilities.
 

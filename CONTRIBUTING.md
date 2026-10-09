@@ -1,6 +1,6 @@
 # Contributing
 
-This hub welcomes general product feedback, feature requests, bug reports, and improvements to its customer-facing resources. Contributions are not limited to portal experiences. The product's implementation is not maintained in this repository.
+This hub welcomes general product feedback, feature requests, bug reports, and improvements to its customer-facing resources. Contributions are welcome across the product. The product's implementation is not maintained in this repository.
 
 ## Choose the right channel
 

@@ -1,6 +1,6 @@
 # Portal feedback integration: GitHub handoff
 
-The destination is **`microsoft/azure-app-service-builder`** on GitHub. It is a product-wide resource and feedback hub, not a portal-only queue, product source repository, or Azure support channel.
+The destination is **`microsoft/azure-app-service-builder`** on GitHub. It is a product-wide resource and feedback hub, not the product source repository or an Azure support channel.
 
 This guide defines the GitHub intake contract. It does not implement portal code, select the portal architecture, provision credentials, or grant permissions. A user-controlled redirect to a GitHub Issue Form is the simplest starting point; the portal integration owner can choose the appropriate design.
 

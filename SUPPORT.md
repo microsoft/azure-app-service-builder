@@ -2,7 +2,7 @@
 
 ## Product feedback and questions
 
-Use [GitHub Issues](https://github.com/microsoft/azure-app-service-builder/issues) for general product feedback, feature requests, reproducible bugs, and questions that can be discussed publicly. Feedback is welcome across the product, including experiences outside the portal. [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first, then select the appropriate [feedback form](https://github.com/microsoft/azure-app-service-builder/issues/new/choose).
+Use [GitHub Issues](https://github.com/microsoft/azure-app-service-builder/issues) for general product feedback, feature requests, reproducible bugs, and questions that can be discussed publicly. Feedback is welcome across the product. [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first, then select the appropriate [feedback form](https://github.com/microsoft/azure-app-service-builder/issues/new/choose).
 
 The product is prelaunch, and product-specific help resources will be added when published. The repository remains private until a separate publication decision; external customers cannot use its intake until access is available.
 

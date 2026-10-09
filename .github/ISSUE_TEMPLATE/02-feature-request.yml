@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Requests are welcome across Azure App Service Builder, not just the portal. A request is not a roadmap commitment.
+        Requests are welcome across Azure App Service Builder. A request is not a roadmap commitment.
         [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first. Add a reaction or a new use case to a relevant existing request.
         Treat your title, responses, comments, and attachments as public. Do not share email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics.
         For account-specific or urgent problems, use [Azure support options](https://azure.microsoft.com/support/options/). Report vulnerabilities privately using [Microsoft's security guidance](https://aka.ms/SECURITY.md), not this form.
