@@ -27,7 +27,7 @@ function editJson(directory, path, edit) {
 
 test('valid package resolves the shared skill through both hosts', () => {
   assert.deepEqual(validatePlugin(), {
-    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.1', skills: 1,
+    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.2', skills: 1,
   });
 });
 
@@ -47,7 +47,7 @@ for (const [name, ending] of [['LF', '\n'], ['CRLF', '\r\n']]) {
     const directory = fixture(t);
     const file = resolve(directory, 'plugin/skills/app-service-builder/SKILL.md');
     writeFileSync(file, readFileSync(file, 'utf8').replaceAll('\r\n', '\n').replaceAll('\n', ending));
-    assert.equal(validatePlugin(directory).version, '0.1.1');
+    assert.equal(validatePlugin(directory).version, '0.1.2');
   });
 }
 
@@ -147,7 +147,7 @@ for (const suffix of ['.tgz', '.tgz.sha256']) {
     const path = resolve(directory, 'docs/agent-plugin.md');
     const url = `https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1-preview.1/azure-builder-cli-0.0.1${suffix}`;
     writeFileSync(path, readFileSync(path, 'utf8') + `\n[Approved release asset](${url})\n`);
-    assert.equal(validatePlugin(directory).version, '0.1.1');
+    assert.equal(validatePlugin(directory).version, '0.1.2');
   });
 }
 
@@ -160,23 +160,21 @@ for (const file of ['docs/agent-plugin.md', 'plugin/skills/app-service-builder/r
       'https://example.invalid/releases'));
     assert.throws(() => validatePlugin(directory), /Missing official CLI release source/);
   });
-
-  test(`rejects removing archive checksum verification in ${file}`, (t) => {
-    const directory = fixture(t);
-    const path = resolve(directory, file);
-    writeFileSync(path, readFileSync(path, 'utf8').replace(
-      'published SHA-256 checksum', 'unverified download'));
-    assert.throws(() => validatePlugin(directory), /Missing archive checksum verification/);
-  });
-
-  test(`rejects making manual checksum verification mandatory in ${file}`, (t) => {
-    const directory = fixture(t);
-    const path = resolve(directory, file);
-    writeFileSync(path, readFileSync(path, 'utf8').replace(
-      'Manual checksum verification is optional', 'Manual checksum verification is required'));
-    assert.throws(() => validatePlugin(directory), /Missing optional manual checksum guidance/);
-  });
 }
+
+test('customer CLI installation uses the downloaded archive and checks the version', () => {
+  const install = readFileSync(resolve(root, 'docs/agent-plugin.md'), 'utf8')
+    .split('## Package layout and local checks')[0];
+  assert.match(install, /npm install --global "<path-to-downloaded-file\.tgz>"\r?\nbuilder --version/);
+});
+
+test('rejects removing archive checksum guidance from agent prerequisites', (t) => {
+  const directory = fixture(t);
+  const path = resolve(directory, 'plugin/skills/app-service-builder/references/prerequisites.md');
+  writeFileSync(path, readFileSync(path, 'utf8').replace(
+    'published SHA-256 checksum', 'unverified download'));
+  assert.throws(() => validatePlugin(directory), /Missing archive checksum verification/);
+});
 
 for (const file of ['docs/agent-plugin.md', 'plugin/README.md', 'CONTRIBUTING.md']) {
   test(`rejects removing canonical CLI installation guidance in ${file}`, (t) => {

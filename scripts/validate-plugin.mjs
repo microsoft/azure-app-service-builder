@@ -312,13 +312,11 @@ export function validatePlugin(root = repositoryRoot) {
     assert(content.includes(archiveInstallCommand) && content.includes('azure-builder-cli-<version>.tgz') &&
       /preview contact/.test(content), `Missing approved archive installation: ${path}`);
     assert(content.includes(`](${cliReleases})`), `Missing official CLI release source: ${path}`);
-    assert(content.includes('published SHA-256 checksum'), `Missing archive checksum verification: ${path}`);
-    assert(content.includes('Manual checksum verification is optional'),
-      `Missing optional manual checksum guidance: ${path}`);
   }
   const prereqs = readFileSync(resolve(skillRoot, 'references/prerequisites.md'), 'utf8');
   assert(/stop deployment/i.test(prereqs) && /already-installed approved/.test(prereqs),
     'Missing prerequisite stop/approved CLI guardrails');
+  assert(prereqs.includes('published SHA-256 checksum'), 'Missing archive checksum verification');
   checkGuidance(skillRoot);
   const install = readFileSync(resolve(root, 'docs/agent-plugin.md'), 'utf8');
   assert(/public repository is the maintained customer skill home/i.test(install),
