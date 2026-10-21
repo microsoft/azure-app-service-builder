@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "runtimeMin": "0.1.0",
+  "runtimeMaxExclusive": "0.2.0",
+  "commit": "522097fc8933b9cd7d98a40c6c49785492f5936c",
+  "path": "canvas-content/versions/1.0.0/content.json",
+  "sha256": "e8d8ad00715cc028d8fada12b922a9d24d92835c7de485cfc6f5eec4567f881b"
+}
