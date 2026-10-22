@@ -28,11 +28,33 @@ secrets in screenshots, logs, or feedback.
 apply to prevent abuse and keep capacity available for participants. Free access
 does not mean unlimited usage.
 
-Limits can cover the number of apps, compute sizes and replicas, concurrent
-builds, build frequency and duration, and certain app operations. The allowances
-that apply depend on your subscription's assigned policy and available regional
-capacity; do not assume that a policy listed in the documentation is the one
-assigned to your subscription.
+The **Preview Free (`preview-free`)** limits for this cohort are:
+
+| Resource or operation | Limit |
+| --- | --- |
+| Builder Apps per Azure subscription | 5 |
+| Compute size | `small` |
+| Maximum replicas per app | 2 |
+| Maximum replicas across the subscription | 10 |
+| Concurrent builds per app | 1 |
+| Concurrent builds across the subscription | 2 |
+| Build-start allowance per app | Up to 10 starts; refills at 10 per hour |
+| Build-start allowance across the subscription | Up to 30 starts; refills at 30 per hour |
+| Build duration | 10 minutes, from admission through output publication |
+| Scale-increase allowance | Up to 10 per app and 30 across the subscription; refills at 10/app/hour and 30/subscription/hour |
+| Retained-version activation or redeploy without a new build | Up to 10 per app and 30 across the subscription; refills at 10/app/hour and 30/subscription/hour |
+
+Replica limits count the sum of configured maximum replicas across compute
+components, not just the number currently running. Build and operation
+allowances refill continuously rather than resetting at the top of each hour.
+Both the app and subscription allowances must have capacity. Scale increases and
+non-build activations have separate allowances; scale-down does not consume the
+scale-increase allowance. Failed or timed-out admitted builds still consume a
+build start.
+
+These limits do not guarantee regional capacity. If an allowance is exhausted,
+wait for capacity to refill or an active build to finish, as applicable, and
+follow the retry guidance in the error.
 
 See [quotas and limits](https://builder.appservice.azure.com/docs/reference/limits/)
 for details. If you encounter a limit or need help understanding your allowance,
