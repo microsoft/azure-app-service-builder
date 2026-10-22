@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "distribution": "0.1.0-preview.4",
+  "release": "https://github.com/microsoft/azure-app-service-builder/releases/tag/canvas-v0.1.0-preview.4",
+  "originalTagCommit": "c772f9d9721416267c016b052dd10166d43232e6",
+  "tagChange": "The published tag is moved to the GitHub-signed commit containing this release record, with maintainer authorization. Uploaded release assets are unchanged. GitHub-generated source archives follow the new tag and are not the installable canvas package.",
+  "assets": [
+    {
+      "name": "app-service-builder-canvas-0.1.0-preview.4.zip",
+      "bytes": 1263441,
+      "sha256": "0869ae56ac0d05765ab57404ab6f59fac03b9c1c64d533dd06b5f5e62a81d736"
+    },
+    {
+      "name": "canvas-testing-guide.md",
+      "bytes": 9454,
+      "sha256": "94f0aad105621f98c086b752b74e56a4b07f286c731d4c3bf0b830a1f4265353"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 203,
+      "sha256": "28e1c366887b588974b772de87fb9a8f74d394acaddd7ef25250b4ee9a7dfcd7"
+    }
+  ],
+  "runtime": {
+    "coreSha256": "a3a6649d443f2bed2a1cd8d00f24d07e69967af16f4a714d5c2e97feeca6c666",
+    "browserSha256": "edf939937010620771e5c343068e47da1dc1b282cac9fb3e5477c03c119ce6f9",
+    "cssSha256": "e181301a1f383bb924c21a4f199b04ad85834120843112e65734cb54bd62c29d"
+  },
+  "signatureScope": "GitHub verifies the signature of the commit containing this record; this is not GitHub certification of the runtime, independent release-asset signing, or service qualification."
+}
