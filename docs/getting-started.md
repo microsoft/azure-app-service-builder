@@ -1,7 +1,7 @@
 # Getting started with App Service Builder
 
-> **MVP Private Preview guide - October 21, 2026.**
-> This guide is for invited MVP participants whose subscriptions have been
+> **Private Preview guide - updated October 21, 2026.**
+> This guide is for invited MVP, 1P, and external participants whose subscriptions have been
 > enabled. It does not grant preview access or announce public availability.
 > Feature availability and feedback instructions below apply to this cohort.
 
@@ -82,12 +82,11 @@ Restart your host session if needed, then try:
 The skill does **not** install Builder CLI; install that separately for CLI-backed
 operations. See the [agent-plugin guide](agent-plugin.md) for more details.
 
-### Builder canvas: a guided visual experience inside the Copilot app
+### Builder canvas: a guided visual experience inside the Copilot app (also Claude Code and VS Code)
 
 The canvas helps you review, configure, and deploy an app through an interactive
 panel. It requires a **compatible Copilot app with native canvas support**; a
-plain terminal CLI cannot display it. macOS is the currently exercised desktop
-host.
+plain terminal CLI cannot display it. Claude Code and VS Code are also supposedly supported, but haven't been tested yet. Feel free to test there and let us know how it goes!
 
 1. Download the packaged canvas ZIP, `canvas-testing-guide.md`, and
    `SHA256SUMS.txt` from the
@@ -98,8 +97,8 @@ host.
    provider. Do not commit the test installation into your app.
 3. Ask in your test project's chat:
 
-   > Open App Service Builder in Azure mode.
-
+   > Open App Service Builder canvas.
+   
 Native canvas operations do not require Builder CLI. The testing guide lists the
 separate Node.js, Azure CLI, and GitHub CLI prerequisites and exact installation
 steps. Review the target and action before authorizing cloud changes.
@@ -114,7 +113,7 @@ deploying it, and understanding the experience. Tell us what feels useful,
 confusing, missing, or broken - small observations are welcome too.
 
 **GitHub Actions deployment, ZIP deploy, managed identity, and built-in
-authentication are coming soon for this cohort.** We will post updates over the
+authentication are coming soon for this cohort.** We will post updates in the Teams channel over the
 next few days as additional features become available and ready for testing.
 
 ## Keep this cohort's feedback in Teams
@@ -130,8 +129,8 @@ team:
 | **General** | Announcements, updates, and newly available features. Keep an eye on this channel! |
 
 **Do not use GitHub feedback templates or feedback links/buttons in the portal
-or canvas for this cohort.** Those routes are public-facing; we want all MVP
-preview feedback kept within this Teams community for now. **This overrides the
+or canvas for this cohort.** Those routes are public-facing; we want all private
+preview feedback kept within the App Service Builder Community team for now. **This overrides the
 general feedback instructions in the public repository and download guides for
 these participants only.**
 
