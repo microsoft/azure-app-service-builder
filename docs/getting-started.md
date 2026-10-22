@@ -22,6 +22,25 @@ This is **Private Preview for development and testing, not production
 workloads**. Use disposable test apps. Avoid sensitive data and never include
 secrets in screenshots, logs, or feedback.
 
+## Private Preview pricing and limits
+
+**App Service Builder is free during Private Preview.** Resource and usage limits
+apply to prevent abuse and keep capacity available for participants. Free access
+does not mean unlimited usage.
+
+Limits can cover the number of apps, compute sizes and replicas, concurrent
+builds, build frequency and duration, and certain app operations. The allowances
+that apply depend on your subscription's assigned policy and available regional
+capacity; do not assume that a policy listed in the documentation is the one
+assigned to your subscription.
+
+See [quotas and limits](https://builder.appservice.azure.com/docs/reference/limits/)
+for details. If you encounter a limit or need help understanding your allowance,
+post in the **Support** channel in the App Service Builder Community team.
+
+Other Azure services you create or connect to your app may still incur their
+normal charges; free Builder access does not make those services free.
+
 ## Choose how you want to work
 
 You can deploy apps today using the **portal, Builder CLI, or Builder canvas**.
