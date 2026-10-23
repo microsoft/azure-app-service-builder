@@ -11,6 +11,7 @@ const referenceNames = [
   'source-and-manifest.md',
   'deployment.md',
   'operations.md',
+  'model-services.md',
 ];
 const productDocs = 'https://builder.appservice.azure.com/docs/';
 const cliInstallDocs = `${productDocs}quickstarts/builder-cli/`;
@@ -33,6 +34,9 @@ const documentationLinks = {
     'guides/logging-and-monitoring/', 'troubleshooting/', 'guides/deployments/',
     'reference/builder-cli/', 'resources/feature-status/', 'guides/variables/',
   ],
+  'references/model-services.md': [
+    'resources/feature-status/', 'guides/connect-to-services/', 'guides/host-ai-agent/', 'guides/variables/',
+  ],
 };
 
 function checkGuidance(skillRoot) {
@@ -46,6 +50,29 @@ function checkGuidance(skillRoot) {
     }
   }
   const rules = [
+    ['SKILL.md', /Inspect before interviewing[^]*ask one focused question at a time/i, 'discovery-first interaction'],
+    ['SKILL.md', /Assume users already have platform access[^]*environment and resources they were given/i, 'existing platform access assumption'],
+    ['SKILL.md', /Do not ask for preview-approval attestations[^]*lack of a separate eligibility confirmation is not a blocker/i, 'no preview eligibility gate'],
+    ['references/prerequisites.md', /do not ask the user to certify runtime availability/i, 'no runtime attestation'],
+    ['references/prerequisites.md', /Azure CLI is unavailable[^]*Do not install Azure CLI just for discovery/i, 'optional Azure CLI discovery'],
+    ['references/prerequisites.md', /List or read resource groups[^.]*before provisioning an app/i, 'resource-group discovery'],
+    ['references/prerequisites.md', /not the resource group's metadata location/i, 'app versus group region'],
+    ['references/prerequisites.md', /accept LF or CRLF[^.]*64-hex-digit digest/i, 'portable checksum handling'],
+    ['references/prerequisites.md', /PowerShell-compatible commands on Windows[^.]*POSIX commands only in an actual POSIX shell/i, 'platform shell selection'],
+    ['references/prerequisites.md', /Multiple saved accounts are not themselves an error/i, 'account-aware source access'],
+    ['references/prerequisites.md', /REST response's numeric `id`[^.]*not the GraphQL\/node ID/i, 'numeric repository identity'],
+    ['references/prerequisites.md', /search by the repository name without the `owner\/` prefix/i, 'repository picker filter'],
+    ['references/prerequisites.md', /Organization missing\?[^]*Review GitHub access[^]*Refresh access/i, 'OAuth visibility recovery'],
+    ['references/deployment.md', /If app creation succeeds but source authorization fails[^]*missing connection/i, 'partial setup recovery'],
+    ['references/operations.md', /All components receive them during build[^]*no runtime-only or per-component secret toggle/i, 'variable exposure boundary'],
+    ['references/model-services.md', /Managed identity is not ready for use[^]*Portal identity blade[^]*does not prove/i, 'model identity availability'],
+    ['references/model-services.md', /Do not limit discovery to the Builder app's resource group/i, 'model resource discovery scope'],
+    ['references/model-services.md', /A project endpoint, model inference endpoint, and deployment name are distinct/i, 'model endpoint distinction'],
+    ['references/model-services.md', /Do not call list-keys or secret-bearing connection operations as a discovery step/i, 'credential-free model discovery'],
+    ['references/model-services.md', /not every model offered by Foundry[^]*\/openai\/v1\/responses/i, 'model API compatibility'],
+    ['references/model-services.md', /If the user's policy requires passwordless access[^]*do not quietly substitute a key/i, 'passwordless policy boundary'],
+    ['references/model-services.md', /Keep that file outside the repository and build context/i, 'model settings file isolation'],
+    ['references/model-services.md', /real model call and its external charges[^]*GET \/health` proves process liveness only/i, 'model verification scope'],
     ['SKILL.md', /If docs and help disagree[^.]*do not guess/i, 'docs/help mismatch'],
     ['SKILL.md', /If docs cannot be fetched[^.]*do not promote unqualified features/i, 'unavailable docs'],
     ['SKILL.md', /Plan approval[^.]*source publication[^.]*cloud deployment[^.]*distinct permissions/i, 'action scope'],
@@ -297,6 +324,8 @@ export function validatePlugin(root = repositoryRoot) {
       `Unapproved installer command: ${path}`);
     assert(!/\bbuilder skills install\b/i.test(content),
       `Duplicate skill installer: ${path}`);
+    assert(!/\b(?:contact|ask|consult|check with|confirm with|suppl(?:y|ied) by)\s+(?:your|the|their|a)\s+preview contact\b|\b(?:your|the|their|an?)\s+preview[- ]approved\b|\bapproved preview target\b/i.test(content),
+      `Preview eligibility gate or contact referral: ${path}`);
     assert(!/CLI installation is a placeholder|does not require customer \.NET|no current Builder CLI commands for variables|this repository does not publish a CLI download URL/i.test(content),
       `Outdated CLI guidance: ${path}`);
     assert(!/\bbuilder manifest (?:propose|generate|repair)\b|--(?:proposal-id|repair-id|resolution)\b|\b(?:ProposalId|RepairId|selectedCandidateIds)\b|\bmanifest rendering\b|\bCLI renders\b/i.test(content),
@@ -309,12 +338,12 @@ export function validatePlugin(root = repositoryRoot) {
   }
   for (const path of ['docs/agent-plugin.md', 'plugin/skills/app-service-builder/references/prerequisites.md']) {
     const content = readFileSync(resolve(root, path), 'utf8');
-    assert(content.includes(archiveInstallCommand) && content.includes('azure-builder-cli-<version>.tgz') &&
-      /preview contact/.test(content), `Missing approved archive installation: ${path}`);
+    assert(content.includes(archiveInstallCommand) && content.includes('azure-builder-cli-<version>.tgz'),
+      `Missing approved archive installation: ${path}`);
     assert(content.includes(`](${cliReleases})`), `Missing official CLI release source: ${path}`);
   }
   const prereqs = readFileSync(resolve(skillRoot, 'references/prerequisites.md'), 'utf8');
-  assert(/stop deployment/i.test(prereqs) && /already-installed approved/.test(prereqs),
+  assert(/stop deployment/i.test(prereqs) && /already-installed official/.test(prereqs),
     'Missing prerequisite stop/approved CLI guardrails');
   assert(prereqs.includes('published SHA-256 checksum'), 'Missing archive checksum verification');
   checkGuidance(skillRoot);

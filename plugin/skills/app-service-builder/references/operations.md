@@ -6,7 +6,7 @@ Consult maintained [logging and monitoring](https://builder.appservice.azure.com
 
 ## Inspect apps and history
 
-First distinguish local manifest diagnostics from cloud build failure, activation failure, and actual runtime HTTP behavior. Use [manifest validation](source-and-manifest.md#validate-builderyaml) to check an existing file and inspect its actual diagnostics and error envelope. Only run optional build validation after explaining script execution and obtaining approval. Local validation does not prove runtime/version/preview qualification.
+First distinguish local manifest diagnostics from cloud build failure, activation failure, and actual runtime HTTP behavior. Use [manifest validation](source-and-manifest.md#validate-builderyaml) to check an existing file and inspect its actual diagnostics and error envelope. Only run optional build validation after explaining script execution and obtaining approval. Local validation does not prove successful hosted activation or serving.
 
 ```shell
 builder app list --subscription "<subscription-id>" --json
@@ -32,6 +32,8 @@ builder app version-config variables list --name "<app-name>" --subscription "<s
 ```
 
 Reads show names, not values. Do not claim that a name-only response verifies a saved value. Treat supplied values and settings files as sensitive; keep them out of chat, source control, shell history, and public feedback.
+
+Variables are not a managed secret store. All components receive them during build, and HTTP components also receive them at runtime; there is no runtime-only or per-component secret toggle. Authorized value retrieval can return all desired values. Do not describe name-only ordinary reads as encryption, non-retrievability, or protection from build scripts. `secretValue` and automatic `keyVaultReference` resolution are unsupported, and managed identity is not currently a usable Key Vault bootstrap. For model keys, explain these boundaries and the [development/test credential workflow](model-services.md#configure-without-exposing-credentials) before accepting a configuration change.
 
 For a requested update, explain the affected names and obtain approval before writing. Use an approved local JSON file containing an object of variable names to string values:
 
