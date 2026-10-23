@@ -8,9 +8,9 @@ Consult maintained [deployments and versions](https://builder.appservice.azure.c
 
 Run initialization from inside an initialized Git worktree for the user's selected app. GitHub sign-in does not select a local repository. Open the app's cloned checkout or change to that directory first; use `git rev-parse --show-toplevel` to verify the location if needed. Do not initialize Git in your home directory to get past the worktree error.
 
-Read `builder init --help`, then start setup from that checkout with the approved preview target.
+Read `builder init --help`, then start setup from that checkout with the selected Azure target.
 
-`builder init` does not automatically analyze or modify `builder.yaml`. Setup does not require a local manifest, a clean worktree, or a local commit matching the pushed branch. It still requires the approved target, management credentials, and source permissions.
+`builder init` does not automatically analyze or modify `builder.yaml`. Setup does not require a local manifest, a clean worktree, or a local commit matching the pushed branch. It still requires the selected target, management credentials, and source permissions.
 
 Local manifest validation is optional and separate from initialization. Review intended configuration changes and obtain approval before writing, committing, or pushing them. Preserve dirty/unrelated work; do not reset, stash, or change branches to make setup pass. Deploy only the intended pushed source, not uncommitted local changes.
 
@@ -23,6 +23,20 @@ Review and confirm interactive values. App provisioning, source connection/autho
 Initialization does not create a saved local app binding: subsequent commands still require app name, subscription, and resource group. For a selected non-root source attachment, inspect current source settings and use the documented `builder app source connect github` flow and its `--root-directory` option only after checking installed help and confirming scope; the init example above must not silently attach the wrong root.
 
 This guide intentionally uses interactive initialization. Noninteractive initialization additionally needs the numeric repository ID, all explicit values, pre-established accounts, and `--yes`; `--yes` cannot approve autodetected values. Do not turn this example into an unattended setup promise.
+
+### Recover partial setup
+
+If app creation succeeds but source authorization fails, report those stages separately and retain the exact app target. Read `app show`, follow the [source-access recovery](prerequisites.md#resolve-account-and-repository-access-precisely), and use the help-verified source-connect command only for the missing connection. Do not create another app, refork the repository, or repeat Microsoft sign-in for a GitHub App access failure.
+
+After the user completes any permission grant and the source connection is authorized, inspect `builder app source connect github --help`. If the installed CLI supports these flags, connect the verified repository to the existing app:
+
+```shell
+builder app source connect github --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --repository-id "<numeric-repository-id>" --repository "<owner/repository>" --branch "<branch>" --root-directory "<app-source-root>" --json
+```
+
+Here `<app-source-root>` is the repository-relative attachment root (`.` for repository root), not an absolute local path. If source was already saved, verify it instead of reconnecting.
+
+Check the actual saved repository ID, branch, root, and automatic-deployment setting after recovery. A mismatched immutable repository identity is a target decision, not a reason to overwrite the existing app. With source ready and deployment authorized, deploy once; source connection alone is not deployment.
 
 ## Deploy pushed source
 

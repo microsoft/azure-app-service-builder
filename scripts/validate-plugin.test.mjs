@@ -27,7 +27,7 @@ function editJson(directory, path, edit) {
 
 test('valid package resolves the shared skill through both hosts', () => {
   assert.deepEqual(validatePlugin(), {
-    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.2', skills: 1,
+    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.3', skills: 1,
   });
 });
 
@@ -47,7 +47,7 @@ for (const [name, ending] of [['LF', '\n'], ['CRLF', '\r\n']]) {
     const directory = fixture(t);
     const file = resolve(directory, 'plugin/skills/app-service-builder/SKILL.md');
     writeFileSync(file, readFileSync(file, 'utf8').replaceAll('\r\n', '\n').replaceAll('\n', ending));
-    assert.equal(validatePlugin(directory).version, '0.1.2');
+    assert.equal(validatePlugin(directory).version, '0.1.3');
   });
 }
 
@@ -94,11 +94,13 @@ test('rejects missing or malformed skill frontmatter', (t) => {
   assert.throws(() => validatePlugin(directory), /frontmatter/);
 });
 
-test('rejects a missing bundled reference', (t) => {
-  const directory = fixture(t);
-  rmSync(resolve(directory, 'plugin/skills/app-service-builder/references/operations.md'));
-  assert.throws(() => validatePlugin(directory), /ENOENT/);
-});
+for (const reference of ['operations.md', 'model-services.md']) {
+  test(`rejects missing bundled reference ${reference}`, (t) => {
+    const directory = fixture(t);
+    rmSync(resolve(directory, `plugin/skills/app-service-builder/references/${reference}`));
+    assert.throws(() => validatePlugin(directory), /ENOENT/);
+  });
+}
 
 for (const file of ['docs/agent-plugin.md', 'plugin/README.md']) {
   test(`rejects broken local links in ${file}`, (t) => {
@@ -132,6 +134,10 @@ for (const [name, addition, expected] of [
   ['stale release-publication prohibition', '\nThis repository does not publish a CLI download URL.\n', /Outdated CLI guidance/],
   ['stale variable-command limitation', '\nThere are no current Builder CLI commands for variables.\n', /Outdated CLI guidance/],
   ['conditional manifest rendering', '\nUse a capable CLI for manifest rendering.\n', /Unshipped manifest authoring guidance/],
+  ['preview contact referral', '\nContact your preview contact before continuing.\n', /Preview eligibility gate or contact referral/],
+  ['preview contact qualification', '\nConfirm with the preview contact that your region supports the runtime.\n', /Preview eligibility gate or contact referral/],
+  ['preview-approved target language', '\nProvide your preview-approved subscription and region.\n', /Preview eligibility gate or contact referral/],
+  ['approved preview target prerequisite', '\nRequire an approved preview target before setup.\n', /Preview eligibility gate or contact referral/],
 ]) {
   test(`rejects ${name}`, (t) => {
     const directory = fixture(t);
@@ -147,7 +153,7 @@ for (const suffix of ['.tgz', '.tgz.sha256']) {
     const path = resolve(directory, 'docs/agent-plugin.md');
     const url = `https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1-preview.1/azure-builder-cli-0.0.1${suffix}`;
     writeFileSync(path, readFileSync(path, 'utf8') + `\n[Approved release asset](${url})\n`);
-    assert.equal(validatePlugin(directory).version, '0.1.2');
+    assert.equal(validatePlugin(directory).version, '0.1.3');
   });
 }
 
@@ -234,6 +240,58 @@ for (const field of ['--proposal-id', '--repair-id', '--resolution', 'ProposalId
 
 const skillRoot = 'plugin/skills/app-service-builder/';
 const unsafeGuidance = [
+  ['missing model-service documentation', 'references/model-services.md',
+    '/docs/guides/host-ai-agent/', '/docs/guides/other/', /canonical documentation/],
+  ['discovery replaced with interviewing', 'SKILL.md',
+    'Inspect before interviewing', 'Ask for every prerequisite first', /discovery-first interaction/],
+  ['requiring proof of platform access', 'SKILL.md',
+    'Assume users already have platform access', 'Require proof of platform enrollment', /existing platform access assumption/],
+  ['requiring preview eligibility confirmation', 'SKILL.md',
+    'Do not ask for preview-approval attestations', 'Ask for preview-approval attestations', /no preview eligibility gate/],
+  ['requiring user runtime certification', 'references/prerequisites.md',
+    'do not ask the user to certify runtime availability', 'ask the user to certify runtime availability', /no runtime attestation/],
+  ['installing Azure CLI for discovery', 'references/prerequisites.md',
+    'Do not install Azure CLI just for discovery', 'Install Azure CLI for discovery', /optional Azure CLI discovery/],
+  ['missing resource-group discovery', 'references/prerequisites.md',
+    'List or read resource groups', 'Guess resource groups', /resource-group discovery/],
+  ['inferring app region from group metadata', 'references/prerequisites.md',
+    "not the resource group's metadata location", "always the resource group's metadata location", /app versus group region/],
+  ['nonportable checksum parsing', 'references/prerequisites.md',
+    'accept LF or CRLF', 'reject CRLF', /portable checksum handling/],
+  ['POSIX-only Windows setup', 'references/prerequisites.md',
+    'PowerShell-compatible commands on Windows', 'Bash commands on Windows', /platform shell selection/],
+  ['treating multiple GitHub accounts as failure', 'references/prerequisites.md',
+    'Multiple saved accounts are not themselves an error', 'Multiple saved accounts are always an error', /account-aware source access/],
+  ['using GitHub node ID for Builder', 'references/prerequisites.md',
+    "REST response's numeric `id`", "GraphQL node ID", /numeric repository identity/],
+  ['wrong repository picker search', 'references/prerequisites.md',
+    'search by the repository name without the `owner/` prefix', 'search by the full owner/name', /repository picker filter/],
+  ['skipping OAuth visibility recovery', 'references/prerequisites.md',
+    'Organization missing? → Review GitHub access', 'Install the GitHub App again', /OAuth visibility recovery/],
+  ['recreating partially initialized apps', 'references/deployment.md',
+    'If app creation succeeds but source authorization fails', 'If setup fails, start over', /partial setup recovery/],
+  ['hiding build-time variable exposure', 'references/operations.md',
+    'All components receive them during build', 'Only the backend receives variables at runtime', /variable exposure boundary/],
+  ['assuming workload identity is available', 'references/model-services.md',
+    'Managed identity is not ready for use', 'Managed identity is ready for use', /model identity availability/],
+  ['restricting model discovery to app group', 'references/model-services.md',
+    "Do not limit discovery to the Builder app's resource group", "Limit discovery to the Builder app's resource group", /model resource discovery scope/],
+  ['conflating project and inference endpoints', 'references/model-services.md',
+    'A project endpoint, model inference endpoint, and deployment name are distinct',
+    'Use the project URL as the inference endpoint', /model endpoint distinction/],
+  ['retrieving keys during discovery', 'references/model-services.md',
+    'Do not call list-keys or secret-bearing connection operations as a discovery step',
+    'Retrieve keys during discovery', /credential-free model discovery/],
+  ['assuming all Foundry models are compatible', 'references/model-services.md',
+    'not every model offered by Foundry', 'every model offered by Foundry', /model API compatibility/],
+  ['silently bypassing passwordless policy', 'references/model-services.md',
+    'do not quietly substitute a key', 'quietly substitute a key', /passwordless policy boundary/],
+  ['placing model keys in source', 'references/model-services.md',
+    'Keep that file outside the repository and build context',
+    'Keep that file inside the repository', /model settings file isolation/],
+  ['treating liveness as model success', 'references/model-services.md',
+    'GET /health` proves process liveness only',
+    'GET /health` proves model success', /model verification scope/],
   ['noncanonical docs host', 'SKILL.md',
     'https://builder.appservice.azure.com/docs/', 'https://example.invalid/docs/', /canonical documentation/],
   ['wrong troubleshooting destination', 'references/operations.md',
