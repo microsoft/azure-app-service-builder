@@ -5,6 +5,15 @@ installed runtime package. Approved product guidance and exact template referenc
 can update independently. Native adapters, permission checks, execution guards,
 app files, forks and cloud resources never update through this feed.
 
+Content 1.0.1 refreshes the product guidance to plugin 0.1.3, including
+discovery-first setup, existing platform access assumptions, source recovery,
+and model connections. Template revisions and runtime compatibility are unchanged.
+Schema 1 accepts exactly four reference sections, so this snapshot appends the
+new model-service reference to `operations` and rewrites its internal links to
+the corresponding section anchors. It does not require a runtime schema change.
+The guidance commit identifies the public source revision before this packaging
+adaptation. The historical 1.0.0 snapshot remains unchanged.
+
 ## Client behavior
 
 The fixed public pointer is
