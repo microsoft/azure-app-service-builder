@@ -10,7 +10,7 @@ body:
         Report unexpected behavior anywhere in Azure App Service Builder.
         [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first.
         Treat your title, responses, comments, and attachments as public. Do not share email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics. Do not attach raw logs, network captures, or diagnostic bundles; use a minimal sanitized example.
-        For account-specific or urgent problems, use [Azure support options](https://azure.microsoft.com/support/options/). Report vulnerabilities privately using [Microsoft's security guidance](https://aka.ms/SECURITY.md), not this form.
+        For App Service Builder help, use the temporary [Support request form](https://github.com/microsoft/azure-app-service-builder/issues/new?template=04-support-request.yml) while official support onboarding is pending. For other Azure services, billing, or account access, consult [Azure support options](https://azure.microsoft.com/support/options/). Report vulnerabilities privately using [Microsoft's security guidance](https://aka.ms/SECURITY.md), not this form.
   - type: textarea
     id: description
     attributes:

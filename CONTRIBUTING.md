@@ -8,11 +8,11 @@ This hub welcomes general product feedback, feature requests, bug reports, and i
 
 Describe the customer problem and outcome in your own words. Use small, sanitized examples for bugs. Do not include email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics in titles, descriptions, comments, or attachments. Submissions to this repository are public.
 
-Use [support guidance](SUPPORT.md) for urgent or account-specific problems. Report vulnerabilities privately through [SECURITY.md](SECURITY.md), never in an issue or pull request.
+For App Service Builder help, use the temporary [Support request form](https://github.com/microsoft/azure-app-service-builder/issues/new?template=04-support-request.yml) while official Azure Support onboarding is pending. Read [support guidance](SUPPORT.md) for scope, urgent or account-specific problems, and privacy limits. Report vulnerabilities privately through [SECURITY.md](SECURITY.md), never in an issue or pull request.
 
 ## What happens to feedback
 
-New feedback is marked `needs-triage`. Maintainers review its category, clarify the customer problem when needed, and identify duplicates. The category labels are `feedback`, `enhancement`, and `bug`; the optional area field supplies context without an extensive label taxonomy.
+New feedback and support requests are marked `needs-triage`. Maintainers review the category, clarify the customer problem when needed, and identify duplicates. The category labels are `feedback`, `enhancement`, `bug`, and `question` (temporary support requests); the optional area field supplies context without an extensive label taxonomy.
 
 Triage is not a delivery commitment or a response-time promise. An issue may remain open for discussion, be linked to an existing issue, or be closed with an explanation. Reactions help describe interest but do not determine priority on their own.
 
