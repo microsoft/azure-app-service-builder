@@ -1,6 +1,6 @@
 # Portal feedback integration: GitHub handoff
 
-The destination is **`microsoft/azure-app-service-builder`** on GitHub. It is a product-wide resource and feedback hub, not the product source repository or an Azure support channel.
+The destination is **`microsoft/azure-app-service-builder`** on GitHub. It is a product-wide resource and feedback hub, not the product source repository or an official Azure Support channel. While official App Service Builder support onboarding is pending, it also provides temporary, best-effort preview support through the Support request form, without a response-time guarantee or SLA.
 
 This guide defines the GitHub intake contract. It does not implement portal code, select the portal architecture, provision credentials, or grant permissions. A user-controlled redirect to a GitHub Issue Form is the simplest starting point; the portal integration owner can choose the appropriate design.
 
@@ -21,8 +21,9 @@ Template files live in `.github/ISSUE_TEMPLATE/`. Keep filenames and field IDs s
 | General feedback | `01-general-feedback.yml` | `feedback`, `needs-triage` |
 | Feature request | `02-feature-request.yml` | `enhancement`, `needs-triage` |
 | Bug report | `03-bug-report.yml` | `bug`, `needs-triage` |
+| Support request | `04-support-request.yml` | `question`, `needs-triage` |
 
-`feedback` means general product input; `needs-triage` means awaiting initial maintainer review. `bug` and `enhancement` are the existing category labels.
+`feedback` means general product input; `needs-triage` means awaiting initial maintainer review. `bug` and `enhancement` are the existing feedback category labels; `question` is used for temporary support requests.
 
 Ensure these labels exist in the destination repository; names in a YAML form do not create labels. The intake setup adds the missing `feedback` and `needs-triage` labels and preserves existing category labels.
 
@@ -31,6 +32,7 @@ Ensure these labels exist in the destination repository; names in a YAML form do
 - [General feedback](https://github.com/microsoft/azure-app-service-builder/issues/new?template=01-general-feedback.yml)
 - [Feature request](https://github.com/microsoft/azure-app-service-builder/issues/new?template=02-feature-request.yml)
 - [Bug report](https://github.com/microsoft/azure-app-service-builder/issues/new?template=03-bug-report.yml)
+- [Support request](https://github.com/microsoft/azure-app-service-builder/issues/new?template=04-support-request.yml)
 - [Form chooser](https://github.com/microsoft/azure-app-service-builder/issues/new/choose)
 - [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue)
 
@@ -68,6 +70,11 @@ All fields are `textarea` unless shown otherwise. The submitted Markdown heading
 | Bug | `area` | Product area | No; dropdown |
 | Bug | `environment` | Environment and regression context | No |
 | Bug | `privacy` | Public sharing acknowledgement | Yes; checkbox option |
+| Support | `help` | Help needed | Yes |
+| Support | `attempts` | What you have tried | Yes |
+| Support | `area` | Product area | No; dropdown |
+| Support | `environment` | Environment context | No |
+| Support | `privacy` | Public sharing acknowledgement | Yes; checkbox option |
 
 The shared `area` options, in order, are `Portal`, `CLI`, `Build or deployment`, `Running applications`, `Documentation`, and `Other or unsure`. The field is optional; do not silently assign a surface or imply the listed areas are supported product capabilities.
 
@@ -100,6 +107,7 @@ The preceding sections must be, in order:
 | General feedback | `### Feedback details`, `### Product area` (optional), `### Additional context` (optional) |
 | Feature request | `### Customer problem`, `### Desired outcome`, `### Product area` (optional), `### Alternatives considered` (optional) |
 | Bug report | `### Bug description`, `### Steps to reproduce`, `### Expected behavior`, `### Actual behavior`, `### Product area` (optional), `### Environment and regression context` (optional) |
+| Support request | `### Help needed`, `### What you have tried`, `### Product area` (optional), `### Environment context` (optional) |
 
 Backend-created issues are authored by the authenticated API actor, not automatically by the customer. Do not promise anonymity or imply a customer GitHub identity that the API has not established. Credentials, permissions, attribution, moderation, rate limiting, and error handling would require a separate design and approval; none are provisioned here. Failures must be surfaced to the user, not reported as successful feedback delivery.
 

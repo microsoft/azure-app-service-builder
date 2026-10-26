@@ -26,7 +26,7 @@ See [plugin installation and readiness limits](docs/agent-plugin.md) for verific
 
 Plugin installation is separate from Builder CLI installation. Obtain the portable `azure-builder-cli-<version>.tgz` archive from the [official CLI releases](https://github.com/microsoft/azure-app-service-builder/releases) and follow the [Builder CLI quickstart](https://builder.appservice.azure.com/docs/quickstarts/builder-cli/). Node.js 22 or later is required; the separate .NET runtime is only for local manifest commands, not login, initialization, or deployment. Customers do not need the .NET SDK.
 
-## Share feedback
+## Share feedback or get help
 
 [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) before opening a new one. Use a reaction on an existing issue to show that it matters to you, and add a comment when you have new context.
 
@@ -35,10 +35,13 @@ Plugin installation is separate from Builder CLI installation. Obtain the portab
 | An experience, suggestion, or general product question | [General feedback](https://github.com/microsoft/azure-app-service-builder/issues/new?template=01-general-feedback.yml) |
 | A customer problem and a desired new capability | [Feature request](https://github.com/microsoft/azure-app-service-builder/issues/new?template=02-feature-request.yml) |
 | Something that did not behave as expected | [Bug report](https://github.com/microsoft/azure-app-service-builder/issues/new?template=03-bug-report.yml) |
+| Help with App Service Builder setup, usage, or troubleshooting | [Support request (temporary preview channel)](https://github.com/microsoft/azure-app-service-builder/issues/new?template=04-support-request.yml) |
 | An account-specific problem or an urgent service issue | [Support guidance](SUPPORT.md) |
 | A suspected security vulnerability | [Security policy and private reporting](SECURITY.md) |
 
 **Treat issue titles, descriptions, comments, and attachments as public.** Do not include email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics. Report vulnerabilities privately, not in GitHub Issues.
+
+Official Azure Support onboarding for App Service Builder is not yet complete. Support requests temporarily go through GitHub Issues on a best-effort basis, without a response-time guarantee or SLA. See [support guidance](SUPPORT.md) for scope and privacy limits.
 
 This repository is public. Repository visibility and feedback intake are separate from product availability and preview access.
 

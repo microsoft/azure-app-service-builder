@@ -1,0 +1,56 @@
+name: Support request
+description: Get help with App Service Builder through the temporary preview support channel.
+labels:
+  - question
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Official Azure Support onboarding for App Service Builder is not yet complete. In the meantime, use this form for App Service Builder setup, usage, and troubleshooting help that can be discussed publicly.
+        This is a temporary, best-effort preview support channel. Opening an issue does not create an official Azure Support ticket or guarantee a response time or SLA.
+        [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first.
+        Treat your title, responses, comments, and attachments as public. Do not share email addresses, account or contact details, credentials, subscription or resource IDs, customer data, or confidential diagnostics. Do not attach raw logs, network captures, or diagnostic bundles; use a minimal sanitized example. If the problem needs private investigation, describe only the non-sensitive symptom and ask maintainers for an appropriate private next step.
+        For other Azure services, billing, or account access, consult [Azure support options](https://azure.microsoft.com/support/options/), subject to your support arrangements. Report vulnerabilities privately using [Microsoft's security guidance](https://aka.ms/SECURITY.md), not this form.
+  - type: textarea
+    id: help
+    attributes:
+      label: Help needed
+      description: What are you trying to accomplish, where are you blocked, and what help do you need? Describe the impact without identifying people, accounts, or resources.
+    validations:
+      required: true
+  - type: textarea
+    id: attempts
+    attributes:
+      label: What you have tried
+      description: Share sanitized steps, documentation you followed, and any workarounds attempted. Summarize errors without including raw diagnostics.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Product area
+      description: Optional context; these areas do not imply available or supported capabilities.
+      options:
+        - Portal
+        - CLI
+        - Build or deployment
+        - Running applications
+        - Documentation
+        - Other or unsure
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment context
+      description: Optional sanitized context such as browser or tool version, operating system, Azure region, or whether this worked previously. Omit account details, resource names and IDs, URLs containing identifiers or tokens, and raw diagnostics.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Public sharing acknowledgement
+      options:
+        - label: I understand that this submission is intended for public sharing, and I have removed personal, sensitive, and confidential information. This is not a security vulnerability report.
+          required: true
