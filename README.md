@@ -6,7 +6,9 @@ App Service Builder is in **Private Preview for development/test, not production
 
 ## Agent skills plugin
 
-The `builder` agent plugin contains one customer-facing skill, `app-service-builder`, for GitHub Copilot CLI and Claude Code. Install it through the repository-hosted marketplace using your installed host:
+The `builder` agent plugin contains one customer-facing skill, `app-service-builder`, for GitHub Copilot CLI and Claude Code. **Using Builder CLI directly? No agent skill is required.** An agent can also follow the public docs without an installed skill; give it the canonical docs and ask it to inspect your app before proposing changes. Reading a docs page or the [skill instructions](plugin/skills/app-service-builder/SKILL.md) does not install or load the skill in the host.
+
+For maintained instructions discovered by a supported agent host, install the plugin through the repository-hosted marketplace and verify discovery. See [getting started](docs/getting-started.md#choose-how-you-want-to-work) for these separate paths.
 
 ### GitHub Copilot CLI
 
@@ -24,7 +26,9 @@ claude plugin install builder@azure-app-service-builder
 
 See [plugin installation and readiness limits](docs/agent-plugin.md) for verification commands and usage.
 
-Plugin installation is separate from Builder CLI installation. Obtain the portable `azure-builder-cli-<version>.tgz` archive from the [official CLI releases](https://github.com/microsoft/azure-app-service-builder/releases) and follow the [Builder CLI quickstart](https://builder.appservice.azure.com/docs/quickstarts/builder-cli/). Node.js 22 or later is required; the separate .NET runtime is only for local manifest commands, not login, initialization, or deployment. Customers do not need the .NET SDK.
+Plugin installation is separate from Builder CLI installation. Obtain the portable `azure-builder-cli-<version>.tgz` archive from the [official CLI releases](https://github.com/microsoft/azure-app-service-builder/releases) and follow the [Builder CLI quickstart](https://builder.appservice.azure.com/docs/quickstarts/builder-cli/). Node.js 22 or later is required; the separate .NET runtime is only for local manifest commands, not login, initialization, or deployment. Customers do not need the .NET SDK. CLI 0.0.2 supports [local-directory/ZIP source deployment](https://builder.appservice.azure.com/docs/guides/deploy-zip-source/) without GitHub sign-in or GitHub App installation.
+
+For **GitHub-backed source only**, Azure sign-in does not grant source access. Your GitHub account and the **App Service Builder** GitHub App must both have access to the selected repository, even when it is public. Review installation and repository consent yourself through Builder's source-control flow; grant only the intended repository. See [source access and recovery](plugin/skills/app-service-builder/references/prerequisites.md#source-authorization-is-separate).
 
 ## Share feedback or get help
 

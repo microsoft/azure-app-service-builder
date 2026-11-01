@@ -27,7 +27,7 @@ function editJson(directory, path, edit) {
 
 test('valid package resolves the shared skill through both hosts', () => {
   assert.deepEqual(validatePlugin(), {
-    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.3', skills: 1,
+    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.4', skills: 1,
   });
 });
 
@@ -47,7 +47,7 @@ for (const [name, ending] of [['LF', '\n'], ['CRLF', '\r\n']]) {
     const directory = fixture(t);
     const file = resolve(directory, 'plugin/skills/app-service-builder/SKILL.md');
     writeFileSync(file, readFileSync(file, 'utf8').replaceAll('\r\n', '\n').replaceAll('\n', ending));
-    assert.equal(validatePlugin(directory).version, '0.1.3');
+    assert.equal(validatePlugin(directory).version, '0.1.4');
   });
 }
 
@@ -102,7 +102,7 @@ for (const reference of ['operations.md', 'model-services.md']) {
   });
 }
 
-for (const file of ['docs/agent-plugin.md', 'plugin/README.md']) {
+for (const file of ['docs/agent-plugin.md', 'docs/getting-started.md', 'plugin/README.md']) {
   test(`rejects broken local links in ${file}`, (t) => {
     const directory = fixture(t);
     const path = resolve(directory, file);
@@ -138,6 +138,8 @@ for (const [name, addition, expected] of [
   ['preview contact qualification', '\nConfirm with the preview contact that your region supports the runtime.\n', /Preview eligibility gate or contact referral/],
   ['preview-approved target language', '\nProvide your preview-approved subscription and region.\n', /Preview eligibility gate or contact referral/],
   ['approved preview target prerequisite', '\nRequire an approved preview target before setup.\n', /Preview eligibility gate or contact referral/],
+  ['stale managed identity prohibition', '\nManaged identity is not ready for use.\n', /Outdated ZIP or managed-identity guidance/],
+  ['stale ZIP availability warning', '\nZIP deployment is coming soon.\n', /Outdated ZIP or managed-identity guidance/],
 ]) {
   test(`rejects ${name}`, (t) => {
     const directory = fixture(t);
@@ -153,7 +155,7 @@ for (const suffix of ['.tgz', '.tgz.sha256']) {
     const path = resolve(directory, 'docs/agent-plugin.md');
     const url = `https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1-preview.1/azure-builder-cli-0.0.1${suffix}`;
     writeFileSync(path, readFileSync(path, 'utf8') + `\n[Approved release asset](${url})\n`);
-    assert.equal(validatePlugin(directory).version, '0.1.3');
+    assert.equal(validatePlugin(directory).version, '0.1.4');
   });
 }
 
@@ -186,7 +188,7 @@ for (const file of ['docs/agent-plugin.md', 'plugin/README.md', 'CONTRIBUTING.md
   test(`rejects removing canonical CLI installation guidance in ${file}`, (t) => {
     const directory = fixture(t);
     const path = resolve(directory, file);
-    writeFileSync(path, readFileSync(path, 'utf8').replace(
+    writeFileSync(path, readFileSync(path, 'utf8').replaceAll(
       'https://builder.appservice.azure.com/docs/quickstarts/builder-cli/',
       'https://builder.appservice.azure.com/docs/other/'));
     assert.throws(() => validatePlugin(directory), /Missing canonical CLI installation guidance/);
@@ -272,8 +274,51 @@ const unsafeGuidance = [
     'If app creation succeeds but source authorization fails', 'If setup fails, start over', /partial setup recovery/],
   ['hiding build-time variable exposure', 'references/operations.md',
     'All components receive them during build', 'Only the backend receives variables at runtime', /variable exposure boundary/],
-  ['assuming workload identity is available', 'references/model-services.md',
-    'Managed identity is not ready for use', 'Managed identity is ready for use', /model identity availability/],
+  ['claiming identity settings prove runtime access', 'references/model-services.md',
+    'does not prove the deployed runtime can obtain a workload token',
+    'proves the deployed runtime can obtain a workload token', /model identity availability/],
+  ['inventing a CLI identity surface', 'references/model-services.md',
+    'There is no Builder CLI identity command', 'Use builder app identity update', /identity surface boundary/],
+  ['identity grants included in deployment consent', 'references/model-services.md',
+    'Identity assignment and destination role grants are separate permission changes',
+    'Deployment consent includes identity and all role grants', /identity consent boundary/],
+  ['identity automatically selecting a client ID', 'references/model-services.md',
+    'Never assume attaching an identity automatically sets this variable',
+    'Attaching an identity always sets AZURE_CLIENT_ID', /identity client selection/],
+  ['assuming key-based sample supports tokens', 'references/model-services.md',
+    'key-based provider needs an explicitly reviewed SDK/code change',
+    'key-based provider automatically uses managed identity', /sample identity compatibility/],
+  ['requiring GitHub for ZIP source', 'references/prerequisites.md',
+    'Local-directory/ZIP deployment does not require Git, GitHub CLI, GitHub sign-in, or a GitHub App installation',
+    'Local-directory/ZIP deployment requires GitHub sign-in', /conditional GitHub prerequisites/],
+  ['public repository bypassing installation coverage', 'references/prerequisites.md',
+    'even for a public repository', 'unless the repository is public', /public repository installation access/],
+  ['agent performing GitHub installation consent', 'references/prerequisites.md',
+    'Do not request all-repository access or perform consent for the user',
+    'Install with all-repository access for the user', /human-scoped GitHub consent/],
+  ['confusing discovery refresh with installation coverage', 'references/prerequisites.md',
+    'Refresh accounts and repositories', 'Refresh nothing', /distinct GitHub refresh actions/],
+  ['hiding uploaded secrets behind gitignore', 'references/deployment.md',
+    'does not apply `.gitignore` or automatically exclude `.env`',
+    'automatically excludes all secrets using .gitignore', /ZIP upload contents review/],
+  ['wrong ZIP manifest size contract', 'references/deployment.md',
+    '**100 MiB**', '**200 MiB**', /ZIP manifest and size contract/],
+  ['ZIP overwriting durable GitHub source', 'references/deployment.md',
+    'does not replace or remove an existing durable GitHub connection',
+    'replaces the GitHub connection', /ZIP durable source preservation/],
+  ['assuming ZIP is the default future source', 'references/deployment.md',
+    'omitting it selects configured GitHub source, not the last local directory',
+    'omitting it redeploys the last local directory', /ZIP repeat-deployment source/],
+  ['ZIP digest treated as a Git commit', 'references/deployment.md',
+    'archive SHA-256, not a Git commit', 'Git commit', /ZIP serving evidence/],
+  ['bypassing disabled upload target', 'references/deployment.md',
+    'stop that workflow', 'retry upload until it works', /ZIP unavailable target boundary/],
+  ['ZIP options implying CI login support', 'references/deployment.md',
+    'ZIP flags alone do not establish unattended CI authentication',
+    'ZIP flags enable unattended CI login', /automation authentication boundary/],
+  ['disabling rulesets for deployment', 'references/deployment.md',
+    'Preserve existing workflows, branch protection, and repository rulesets',
+    'Disable branch protection and repository rulesets', /automation repository protection/],
   ['restricting model discovery to app group', 'references/model-services.md',
     "Do not limit discovery to the Builder app's resource group", "Limit discovery to the Builder app's resource group", /model resource discovery scope/],
   ['conflating project and inference endpoints', 'references/model-services.md',
@@ -353,6 +398,16 @@ const unsafeGuidance = [
     'not vendored into the plugin or fetched by packaging tests/builds', 'fetched in every packaging build', /offline sample boundary/],
   ['Vite as runtime guarantee', 'references/source-and-manifest.md',
     'static Vite sample is not a TypeScript web-runtime guarantee', 'static Vite guarantees a web runtime', /static runtime distinction/],
+  ['static output replacing source input', 'references/source-and-manifest.md',
+    'not the source ZIP', 'always the source ZIP', /static output versus source input/],
+  ['whole repository as public static output', 'references/source-and-manifest.md',
+    'Use `output: .` only when that component root intentionally contains public assets',
+    'Use output: . for every repository', /static publication scope/],
+  ['uploading dist without its manifest', 'references/source-and-manifest.md',
+    'Do not upload only `dist` unless', 'Always upload only `dist`', /static source manifest preservation/],
+  ['inventing a cause for static publication failures', 'references/operations.md',
+    'do not infer a whole-repository upload, file-count/size limit, timeout, or port problem',
+    'assume a file-count limit or port problem', /static failure evidence boundary/],
   ['retired sample path', 'references/source-and-manifest.md',
     '## Combined shape', 'Use samples/nodejs-web as the app root.\n\n## Combined shape', /Retired sample distribution path/],
   ['removed public ownership', 'SKILL.md',
@@ -420,6 +475,26 @@ const unsafeGuidance = [
   ['duplicate skill installation route', 'SKILL.md',
     '## Before acting', 'Run builder skills install first.\n\n## Before acting', /Duplicate skill installer/],
 ];
+
+for (const [name, before, after, expected] of [
+  ['requiring a skill for CLI-only use', 'no agent skill is required', 'the agent skill is required',
+    /CLI-only onboarding boundary/],
+  ['claiming init generates the manifest', 'builder init` does not generate it',
+    'builder init` generates it', /novice manifest authoring boundary/],
+  ['confusing source with build output', 'build output is a different location',
+    'build output is always the source root', /novice source\/output distinction/],
+  ['skipping deployed route verification', 'valid manifest or successful build is not proof that the app serves correctly',
+    'valid manifest proves the app serves correctly', /novice deployed verification boundary/],
+]) {
+  test(`rejects novice onboarding regression: ${name}`, (t) => {
+    const directory = fixture(t);
+    const path = resolve(directory, 'docs/getting-started.md');
+    const content = readFileSync(path, 'utf8');
+    assert(content.includes(before), `Mutation target not found: ${before}`);
+    writeFileSync(path, content.replace(before, after));
+    assert.throws(() => validatePlugin(directory), expected);
+  });
+}
 
 for (const [name, path, before, after, expected] of unsafeGuidance) {
   test(`rejects ${name}`, (t) => {

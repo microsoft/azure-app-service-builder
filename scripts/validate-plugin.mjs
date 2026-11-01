@@ -22,20 +22,23 @@ const documentationLinks = {
   'SKILL.md': ['', 'resources/feature-status/', 'samples/'],
   'references/prerequisites.md': [
     'resources/preview/', 'resources/feature-status/', 'reference/builder-cli/',
-    'quickstarts/builder-cli/',
+    'quickstarts/builder-cli/', 'resources/regions/',
   ],
   'references/source-and-manifest.md': [
     'guides/source-control/', 'guides/builder-yaml/', 'reference/runtimes/', 'resources/feature-status/', 'samples/',
   ],
   'references/deployment.md': [
     'guides/deployments/', 'guides/source-control/', 'reference/builder-cli/', 'resources/feature-status/',
+    'guides/deploy-zip-source/',
   ],
   'references/operations.md': [
     'guides/logging-and-monitoring/', 'troubleshooting/', 'guides/deployments/',
     'reference/builder-cli/', 'resources/feature-status/', 'guides/variables/',
+    'guides/runtime-logs-log-analytics/',
   ],
   'references/model-services.md': [
     'resources/feature-status/', 'guides/connect-to-services/', 'guides/host-ai-agent/', 'guides/variables/',
+    'guides/managed-identity/', 'reference/arm-api/#managed-identity-contract',
   ],
 };
 
@@ -65,7 +68,13 @@ function checkGuidance(skillRoot) {
     ['references/prerequisites.md', /Organization missing\?[^]*Review GitHub access[^]*Refresh access/i, 'OAuth visibility recovery'],
     ['references/deployment.md', /If app creation succeeds but source authorization fails[^]*missing connection/i, 'partial setup recovery'],
     ['references/operations.md', /All components receive them during build[^]*no runtime-only or per-component secret toggle/i, 'variable exposure boundary'],
-    ['references/model-services.md', /Managed identity is not ready for use[^]*Portal identity blade[^]*does not prove/i, 'model identity availability'],
+    ['references/model-services.md', /Managed identity is documented[^]*?Portal identity blade[^.]*does not prove the deployed runtime can obtain a workload token/i, 'model identity availability'],
+    ['references/model-services.md', /There is no Builder CLI identity command/i, 'identity surface boundary'],
+    ['references/model-services.md', /Identity assignment and destination role grants are separate permission changes/i, 'identity consent boundary'],
+    ['references/model-services.md', /Identity-only saves redeploy retained build output[^]*NoBuildArtifacts[^]*initial deployment/i, 'identity deployment boundary'],
+    ['references/model-services.md', /principal ID[^]*destination data role[^]*client ID[^]*SDK selection/i, 'identity identifier distinction'],
+    ['references/model-services.md', /Never assume attaching an identity automatically sets this variable/i, 'identity client selection'],
+    ['references/model-services.md', /key-based provider needs an explicitly reviewed SDK\/code change/i, 'sample identity compatibility'],
     ['references/model-services.md', /Do not limit discovery to the Builder app's resource group/i, 'model resource discovery scope'],
     ['references/model-services.md', /A project endpoint, model inference endpoint, and deployment name are distinct/i, 'model endpoint distinction'],
     ['references/model-services.md', /Do not call list-keys or secret-bearing connection operations as a discovery step/i, 'credential-free model discovery'],
@@ -79,6 +88,11 @@ function checkGuidance(skillRoot) {
     ['references/prerequisites.md', /do not silently switch global CLI accounts or reuse another account's credential/i, 'account preservation'],
     ['references/prerequisites.md', /^builder login\r?$/m, 'customer login default'],
     ['references/prerequisites.md', /Use `--tenant` only when the user explicitly needs a specific Azure\/Entra directory/i, 'optional tenant boundary'],
+    ['references/prerequisites.md', /Local-directory\/ZIP deployment does not require Git, GitHub CLI, GitHub sign-in, or a GitHub App installation/i, 'conditional GitHub prerequisites'],
+    ['references/prerequisites.md', /even for a public repository/i, 'public repository installation access'],
+    ['references/prerequisites.md', /slug `app-service-builder`[^]*AzureAppService/i, 'public GitHub App identity'],
+    ['references/prerequisites.md', /Only select repositories[^]*Do not request all-repository access or perform consent for the user/i, 'human-scoped GitHub consent'],
+    ['references/prerequisites.md', /Refresh accounts and repositories[^]*reload discovery[^]*Refresh access[^]*selected repository/i, 'distinct GitHub refresh actions'],
     ['references/source-and-manifest.md', /before Git initialization or account connection/i, 'local inspection'],
     ['references/source-and-manifest.md', /Do not scan[^.]*reset, stash, or change branches without approval/i, 'checkout preservation'],
     ['references/source-and-manifest.md', /inspect ancestry/i, 'source ancestry'],
@@ -94,6 +108,9 @@ function checkGuidance(skillRoot) {
     ['references/source-and-manifest.md', /Disclose discrepancies between production docs and current sample README/i, 'sample documentation drift'],
     ['references/source-and-manifest.md', /not vendored into the plugin or fetched by packaging tests\/builds/i, 'offline sample boundary'],
     ['references/source-and-manifest.md', /static Vite sample is not a TypeScript web-runtime guarantee/i, 'static runtime distinction'],
+    ['references/source-and-manifest.md', /Static component `output`[^]*not the source ZIP[^]*custom builds[^]*\$DESTINATION_DIR/i, 'static output versus source input'],
+    ['references/source-and-manifest.md', /Use `output: \.` only when that component root intentionally contains public assets/i, 'static publication scope'],
+    ['references/source-and-manifest.md', /Do not upload only `dist` unless[^.]*valid root manifest/i, 'static source manifest preservation'],
     ['references/source-and-manifest.md', /runtime enablement has not reached the selected target/i, 'deployed runtime qualification'],
     ['references/source-and-manifest.md', /Do not switch languages or replace the app to conceal the rejection/i, 'runtime failure transparency'],
     ['references/source-and-manifest.md', /not a successful hosted deployment/i, 'sample completion evidence'],
@@ -106,6 +123,7 @@ function checkGuidance(skillRoot) {
     ['references/operations.md', /Reconciliation is read-only[^.]*must not implicitly resume writes/i, 'read-only reconciliation'],
     ['references/operations.md', /A transient HTTP 429 during status polling can end the local wait while the accepted operation continues/i, 'polling failure reconciliation'],
     ['references/operations.md', /Do not assume automatic status-read retries/i, 'polling retry boundary'],
+    ['references/operations.md', /static asset upload failed[^]*do not infer a whole-repository upload, file-count\/size limit, timeout, or port problem/i, 'static failure evidence boundary'],
     ['references/operations.md', /changed intent needs a new ID/i, 'retry intent'],
     ['references/operations.md', /Do not promise universal cancellation/i, 'cancellation uncertainty'],
     ['SKILL.md', /public repository is the maintained customer skill home/i, 'public skill ownership'],
@@ -129,6 +147,16 @@ function checkGuidance(skillRoot) {
     ['references/deployment.md', /Do not initialize Git in your home directory/i, 'home-directory protection'],
     ['references/deployment.md', /does not require a local manifest, a clean worktree, or a local commit matching the pushed branch/i, 'init source contract'],
     ['references/deployment.md', /`--yes` cannot approve autodetected values/i, 'init explicit noninteractive values'],
+    ['references/deployment.md', /ZIP-only app[^]*NotConfigured[^]*do not install the GitHub App or run Git-backed `init`/i, 'ZIP source-free setup'],
+    ['references/deployment.md', /does not apply `\.gitignore` or automatically exclude `\.env`/i, 'ZIP upload contents review'],
+    ['references/deployment.md', /byte for byte[^]*100 MiB[^]*1 MiB/i, 'ZIP manifest and size contract'],
+    ['references/deployment.md', /Do not combine either upload selector with `--commit`, `--rebuild`, `--version`, `--previous`/i, 'ZIP selector exclusivity'],
+    ['references/deployment.md', /does not replace or remove an existing durable GitHub connection/i, 'ZIP durable source preservation'],
+    ['references/deployment.md', /omitting it selects configured GitHub source, not the last local directory/i, 'ZIP repeat-deployment source'],
+    ['references/deployment.md', /source\.revision[^]*archive SHA-256, not a Git commit/i, 'ZIP serving evidence'],
+    ['references/deployment.md', /SourceUploadDisabled[^]*stop that workflow/i, 'ZIP unavailable target boundary'],
+    ['references/deployment.md', /ZIP flags alone do not establish unattended CI authentication/i, 'automation authentication boundary'],
+    ['references/deployment.md', /Preserve existing workflows, branch protection, and repository rulesets/i, 'automation repository protection'],
     ['references/operations.md', /builder app version-config variables --help/i, 'variable capability discovery'],
     ['references/operations.md', /Reads show names, not values/i, 'variable read boundary'],
     ['references/operations.md', /obtain approval before writing/i, 'variable write approval'],
@@ -144,6 +172,12 @@ function checkGuidance(skillRoot) {
     'builder manifest validate "<app-source-root>" --build --json',
   ]) {
     assert(source.includes(command), `Missing shipped manifest command: ${command}`);
+  }
+  for (const command of [
+    'builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --source "<reviewed-source-directory>" --json',
+    'builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --source-archive "<source-zip-path>" --manifest "<matching-builder-yaml-path>" --json',
+  ]) {
+    assert(contents['references/deployment.md'].includes(command), `Missing shipped ZIP command: ${command}`);
   }
   const examples = ['static-html', 'vite', 'nodejs', 'python', 'dotnet'];
   for (const example of examples) {
@@ -307,6 +341,7 @@ export function validatePlugin(root = repositoryRoot) {
     ...pluginFiles.filter((path) => path.endsWith('.md')),
     resolve(root, 'README.md'),
     resolve(root, 'docs/agent-plugin.md'),
+    resolve(root, 'docs/getting-started.md'),
     resolve(root, 'CONTRIBUTING.md'),
   ];
   for (const path of docs) {
@@ -328,6 +363,8 @@ export function validatePlugin(root = repositoryRoot) {
       `Preview eligibility gate or contact referral: ${path}`);
     assert(!/CLI installation is a placeholder|does not require customer \.NET|no current Builder CLI commands for variables|this repository does not publish a CLI download URL/i.test(content),
       `Outdated CLI guidance: ${path}`);
+    assert(!/managed identity is not (?:ready for use|currently (?:available|usable))|managed[- ]identity bootstrap (?:are|is) unavailable|ZIP deploy(?:ment)?[^.\n]*coming soon/i.test(content),
+      `Outdated ZIP or managed-identity guidance: ${path}`);
     assert(!/\bbuilder manifest (?:propose|generate|repair)\b|--(?:proposal-id|repair-id|resolution)\b|\b(?:ProposalId|RepairId|selectedCandidateIds)\b|\bmanifest rendering\b|\bCLI renders\b/i.test(content),
       `Unshipped manifest authoring guidance: ${path}`);
   }
@@ -347,6 +384,23 @@ export function validatePlugin(root = repositoryRoot) {
     'Missing prerequisite stop/approved CLI guardrails');
   assert(prereqs.includes('published SHA-256 checksum'), 'Missing archive checksum verification');
   checkGuidance(skillRoot);
+  for (const path of ['README.md', 'docs/agent-plugin.md', 'docs/getting-started.md']) {
+    const content = readFileSync(resolve(root, path), 'utf8');
+    assert(/no agent skill is required/i.test(content), `Missing CLI-only onboarding boundary: ${path}`);
+    assert(/agent[^]*without (?:an installed |a )skill/i.test(content),
+      `Missing docs-only agent onboarding: ${path}`);
+  }
+  const onboarding = readFileSync(resolve(root, 'docs/getting-started.md'), 'utf8');
+  assert(/builder init` does not generate it[^]*builder manifest validate` only checks/i.test(onboarding),
+    'Missing novice manifest authoring boundary');
+  assert(/source root[^]*build output is a different location[^]*\$DESTINATION_DIR/i.test(onboarding),
+    'Missing novice source/output distinction');
+  assert(/HTTP app[^]*startup[^]*declared port[^]*configured health route/i.test(onboarding),
+    'Missing novice HTTP manifest contract');
+  assert(/valid manifest or successful build is not proof that the app serves correctly/i.test(onboarding),
+    'Missing novice deployed verification boundary');
+  assert(onboarding.includes('](https://builder.appservice.azure.com/docs/guides/deploy-zip-source/)'),
+    'Missing novice ZIP walkthrough');
   const install = readFileSync(resolve(root, 'docs/agent-plugin.md'), 'utf8');
   assert(/public repository is the maintained customer skill home/i.test(install),
     'Installation docs must identify public skill ownership');

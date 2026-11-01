@@ -8,6 +8,15 @@ Consult maintained [logging and monitoring](https://builder.appservice.azure.com
 
 First distinguish local manifest diagnostics from cloud build failure, activation failure, and actual runtime HTTP behavior. Use [manifest validation](source-and-manifest.md#validate-builderyaml) to check an existing file and inspect its actual diagnostics and error envelope. Only run optional build validation after explaining script execution and obtaining approval. Local validation does not prove successful hosted activation or serving.
 
+| Failing stage | Evidence to inspect before changing source |
+| --- | --- |
+| CLI source upload / checkout | Selected directory/ZIP, root manifest and exact matching bytes, upload status, and checkout error; not static output publication |
+| Build / static publication | Version build log, resolved component roots/output, and generated public file inventory; exclude unintended repository files from publication |
+| Activation / runtime health | Deployment log, supported runtime, actual startup/listener, declared port, and implemented health route |
+| Serving / application behavior | Active version and returned URL, expected response content, nested routes/assets, and any dependency operation |
+
+For a generic **static asset upload failed** message, do not infer a whole-repository upload, file-count/size limit, timeout, or port problem from the wording alone. Check which stage failed and whether the resolved static `output` contains only intended public assets; preserve the service code and sanitized diagnostic details. Correct a confirmed output selection without stripping required source/build inputs from a source ZIP. If diagnostics do not expose a cause, report that gap and the unverified stage rather than claiming a recipe or retry fixed the deployment.
+
 ```shell
 builder app list --subscription "<subscription-id>" --json
 builder app show --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --json
@@ -21,6 +30,8 @@ builder app deploymentlog "<deployment-id>" --name "<app-name>" --subscription "
 
 Version and deployment IDs must come from actual history. Use build logs to diagnose build failure and deployment logs to diagnose activation failure. `version build-log` can select `--component "<component>"` when needed. These commands are not runtime log streaming or live HTTP metrics; do not invent equivalent CLI commands.
 
+For application stdout/stderr export, consult the separate [runtime-log export guide](https://builder.appservice.azure.com/docs/guides/runtime-logs-log-analytics/) and current target availability. This is an ARM configuration workflow using a customer-owned destination and the app's managed identity, not a live Portal log viewer or automatic destination provisioning. Destination setup, identity/ingestion permissions, and export configuration require their own scoped authorization; a saved setting is not proof that new log records reached the workspace.
+
 ## Manage desired variables
 
 Consult [application variables](https://builder.appservice.azure.com/docs/guides/variables/) and check `builder app version-config variables --help`, then the relevant command-specific help. If a command or flag is absent, report the installed CLI limitation rather than guessing a replacement.
@@ -33,7 +44,7 @@ builder app version-config variables list --name "<app-name>" --subscription "<s
 
 Reads show names, not values. Do not claim that a name-only response verifies a saved value. Treat supplied values and settings files as sensitive; keep them out of chat, source control, shell history, and public feedback.
 
-Variables are not a managed secret store. All components receive them during build, and HTTP components also receive them at runtime; there is no runtime-only or per-component secret toggle. Authorized value retrieval can return all desired values. Do not describe name-only ordinary reads as encryption, non-retrievability, or protection from build scripts. `secretValue` and automatic `keyVaultReference` resolution are unsupported, and managed identity is not currently a usable Key Vault bootstrap. For model keys, explain these boundaries and the [development/test credential workflow](model-services.md#configure-without-exposing-credentials) before accepting a configuration change.
+Variables are not a managed secret store. All components receive them during build, and HTTP components also receive them at runtime; there is no runtime-only or per-component secret toggle. Authorized value retrieval can return all desired values. Do not describe name-only ordinary reads as encryption, non-retrievability, or protection from build scripts. `secretValue` and automatic `keyVaultReference` resolution are unsupported. App-owned Key Vault SDK access can use a configured [managed identity](model-services.md#configure-and-verify-workload-identity) with approved destination access; it does not resolve variable references automatically. For model keys, explain these boundaries and the [development/test credential workflow](model-services.md#configure-without-exposing-credentials) before accepting a configuration change.
 
 For a requested update, explain the affected names and obtain approval before writing. Use an approved local JSON file containing an object of variable names to string values:
 

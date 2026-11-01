@@ -10,7 +10,7 @@ Use an already-installed official `builder` CLI when available. Otherwise obtain
 
 Use the CLI release asset, not GitHub's automatic source-code ZIP or tarball. When an agent downloads the CLI for a user, compare it with the provided published SHA-256 checksum before installing and stop on a mismatch. If the asset or trusted checksum cannot be found, report the exact missing release artifact and link to the official releases page rather than guessing a version or download URL.
 
-The CLI 0.0.1 preview assets are the [portable CLI archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1-preview.1/azure-builder-cli-0.0.1.tgz) and its [SHA-256 checksum](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1-preview.1/azure-builder-cli-0.0.1.tgz.sha256).
+The CLI 0.0.2 preview assets are the [portable CLI archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz) and its [SHA-256 checksum](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz.sha256). Local-directory/ZIP deployment requires 0.0.2 or a compatible later release; inspect installed help before choosing it.
 
 After approval to install the downloaded archive:
 
@@ -38,7 +38,7 @@ dotnet --list-runtimes
 
 If the runtime is missing or incompatible, report the actual requirement and stop that local command rather than automatically installing a runtime or a different analyzer. This does not block ordinary CLI login, setup, or deployment.
 
-Require local Git and GitHub CLI (`gh`) for source operations. If deployment prerequisites are absent or too old, report them and stop deployment rather than installing or upgrading them automatically.
+Require local Git and GitHub CLI (`gh`) only for GitHub source operations. Local-directory/ZIP deployment does not require Git, GitHub CLI, GitHub sign-in, or a GitHub App installation. If prerequisites for the selected deployment workflow are absent or too old, report them and stop deployment rather than installing or upgrading them automatically.
 
 Verify access to the selected subscription and resolve the app location from existing configuration or the user's choice. Use an **existing resource group** for CLI initialization. If a requested group is missing, offer existing groups from the selected subscription; do not require the user to know another name. Creating a group is a separate, explicitly authorized operation, not an effect of `builder init`. The documented Portal creation flow can create a group; do not call an existing group a universal product requirement. Do not invent onboarding, regions, endpoints, or configuration commands.
 
@@ -54,12 +54,11 @@ Validation is local and read-only. Only optional build validation executes repos
 
 ## Read-only readiness checks
 
-Local code and manifest inspection does not require Git initialization, sign-in, or a source connection. Do not create a repository or connect accounts just to read files. For cloud work, inspect local tooling and account state in the deliberately selected checkout:
+Local code and manifest inspection does not require Git initialization, sign-in, or a source connection. Do not create a repository or connect accounts just to read files. For cloud work, inspect local tooling and account state in the deliberately selected app directory:
 
 ```shell
 node --version
-git --version
-gh --version
+builder --version
 builder --help
 builder account show
 builder doctor --help
@@ -67,6 +66,8 @@ builder doctor --json
 ```
 
 Read individual diagnostic statuses. Without an explicit app target, `doctor` can skip app-specific checks; that does not prove subscription, source, or GitHub App access. Once a target exists, inspect help and rerun with its supported app/subscription/resource-group/repository selectors.
+
+For GitHub source, also inspect `git --version`, `gh --version`, and the access checks below. For a ZIP-only app, GitHub-specific diagnostic failures or `sourceIntegrationState: "NotConfigured"` are not GitHub prerequisites to fix; verify Azure access and the selected upload workflow instead. A skipped upload or target check is still not a pass.
 
 ### Discover the Azure target before asking
 
@@ -84,7 +85,7 @@ az group list --subscription "<subscription-id>" --query "[].{id:id,name:name,lo
 
 List or read resource groups in that selected subscription before provisioning an app. Check the exact requested group first; distinguish not found from denied access or a failed lookup. Reuse its verified name and ID, or present discovered alternatives. An empty or failed read does not authorize group creation.
 
-Resolve the app location from an existing app, saved target configuration, or the user's region choice, not the resource group's metadata location. Check current runtime docs and the selected sample yourself; do not ask the user to certify runtime availability. There is no published Builder region matrix: ordinary Azure region/provider listings do not establish Builder runtime activation. Explain any specific documented target limitation, but do not turn a missing region matrix into an approval questionnaire. For an otherwise documented workflow, proceed within the user's authorized action and inspect the actual service result; a successful build still does not prove activation or serving.
+Resolve the app location from an existing app, saved target configuration, or the user's region choice, not the resource group's metadata location. Check [available regions](https://builder.appservice.azure.com/docs/resources/regions/), current runtime docs, and the selected sample yourself; do not ask the user to certify runtime availability. The region guide currently lists East US 2 (`eastus2`) and West US 2 (`westus2`); a listed region or ordinary Azure provider listing does not establish every runtime's activation support. Explain any specific documented target limitation without turning it into an approval questionnaire. For an otherwise documented workflow, proceed within the user's authorized action and inspect the actual service result; a successful build still does not prove activation or serving.
 
 The intended/selected account, verified identity, and actual target access are different checks. Do not request sign-in if the existing context is already correct. Preserve machine-wide account configuration: do not silently switch global CLI accounts or reuse another account's credential. Do not change tenants, subscriptions, or connections silently. If the confirmed management context needs authentication, consult help and use:
 
@@ -96,13 +97,13 @@ Use `--tenant` only when the user explicitly needs a specific Azure/Entra direct
 
 ## Source authorization is separate
 
-Inspect `gh auth status` and the selected repository's access without exposing credentials. When Builder source authorization is needed, consult help and use:
+This section applies only to GitHub-backed source. Skip GitHub sign-in and installation for local-directory/ZIP deployment; Azure management sign-in remains required. Inspect `gh auth status` and the selected repository's access without exposing credentials. When Builder source authorization is needed, consult help and use:
 
 ```shell
 builder source login github
 ```
 
-GitHub user authorization does not prove that the GitHub App installation can access the selected repository. Check installation access separately through Builder's source connection flow. Stop if access is missing; do not change repository permissions or install a GitHub App automatically.
+Azure sign-in, GitHub user authorization, and GitHub App installation are three distinct access checks. GitHub user authorization does not prove that the GitHub App installation can access the selected repository, even for a public repository. Check installation access separately through Builder's source connection flow. Stop if access is missing; do not change repository permissions or install a GitHub App automatically.
 
 ### Resolve account and repository access precisely
 
@@ -117,14 +118,16 @@ gh api --hostname github.com "repos/<owner>/<repository>" --jq "{id,full_name,de
 
 Use the REST response's numeric `id` for Builder, not the GraphQL/node ID from `gh repo view --json id`.
 
-For source HTTP 403, read the specific error before prescribing a permission fix. If it identifies missing GitHub App access, preserve any app already created and guide the user through the selected environment's **Settings → Source Control** installation/access link. The app may be called **Embr** in an error; do not guess a production/staging installation URL from that name. The user reviews the correct owner and grants access only to the intended repository, with any required organization approval.
+For source HTTP 403, read the specific error before prescribing a permission fix. `AppSourceAuthorizationFailed` or `SourceAuthorizationFailed` can identify a source-access failure; use its message to distinguish missing installation coverage from other authorization problems. If it identifies missing GitHub App access, preserve any app already created and guide the human through the selected environment's **Settings → Source Control** installation/access link.
+
+For the public Builder Portal, the GitHub App is **App Service Builder**, slug `app-service-builder`, published by **AzureAppService**: [review the GitHub App](https://github.com/apps/app-service-builder). Prefer Builder's repository-scoped installation link so it suggests the intended owner and repository. The app may be called **Embr** in an error; do not infer a different environment's installation URL from that name. The human reviews the publisher, owner, requested permissions, and repository selection, then chooses **Only select repositories** for the intended repository, including required organization approval. Do not request all-repository access or perform consent for the user. Installation is not Azure login or agent-plugin installation.
 
 For a missing repository in Portal, select its owner in **Organization**, clear the repository filter, and search by the repository name without the `owner/` prefix. The picker filters displayed repository names; a full `owner/name` search can show **No results found** even when access exists. Check loading, pagination, and lookup errors before declaring the repository absent. An attached app's repository identity is locked; a disabled selector is not proof of missing permission.
 
-If the owner/organization itself is missing, use **Organization missing? → Review GitHub access** for the OAuth App, including organization approval/SSO where needed. OAuth access and GitHub App installation are separate; installing the latter does not fix the former. After approval, close the installation window or select **Refresh access** explicitly. Returning to the tab or a user saying "granted" is not proof: recheck the exact repository/branch and saved source state, then retry only the blocked connection. Keep automatic deployments off; do not recreate the app or deploy as an access probe.
+If the owner/organization itself is missing, use **Organization missing? → Review GitHub access** for the OAuth App, including organization approval/SSO where needed. OAuth access and GitHub App installation are separate; installing the latter does not fix the former. Return to Builder and use **Refresh accounts and repositories** in that help section to reload discovery. After GitHub App installation approval, close the installation window or select **Refresh access** to recheck coverage for the selected repository. Returning to the tab or a user saying "granted" is not proof: recheck the exact repository/branch and saved source state, then retry only the blocked connection. Keep automatic deployments off; do not recreate the app or deploy as an access probe.
 
 Keep credentials out of chat, manifests, remote URLs, and logs. Inspect only credential-free repository origins; do not display a token-bearing origin or copy it into a command. An account selection or successful login alone is not evidence of repository access.
 
 Microsoft management sign-in and GitHub source access do not configure authentication for visitors to the deployed app. There is no current Builder CLI command for deployed-app authentication.
 
-Proceed only when the exact target, account context, source access, and CLI diagnostics are ready. Never treat a missing prerequisite as a successful readiness check.
+Proceed only when the exact target, account context, workflow-specific source access, and relevant CLI diagnostics are ready. Never treat a missing prerequisite as a successful readiness check.
