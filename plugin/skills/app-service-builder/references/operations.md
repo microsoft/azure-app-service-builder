@@ -32,6 +32,12 @@ Version and deployment IDs must come from actual history. Use build logs to diag
 
 For application stdout/stderr export, consult the separate [runtime-log export guide](https://builder.appservice.azure.com/docs/guides/runtime-logs-log-analytics/) and current target availability. This is an ARM configuration workflow using a customer-owned destination and the app's managed identity, not a live Portal log viewer or automatic destination provisioning. Destination setup, identity/ingestion permissions, and export configuration require their own scoped authorization; a saved setting is not proof that new log records reached the workspace.
 
+## Visitor identity and header checks
+
+Use the [deployed-app authentication guide](https://builder.appservice.azure.com/docs/guides/authentication/) for visitor sign-in and principal-header semantics, not Azure management login or GitHub source authorization. It documents removal of caller-supplied `X-MS-CLIENT-PRINCIPAL`, `X-MS-CLIENT-PRINCIPAL-ID`, `X-MS-CLIENT-PRINCIPAL-NAME`, and `X-MS-CLIENT-PRINCIPAL-IDP` before verified visitor identity is supplied. Do not treat headers supplied to localhost or another host as trusted Builder identity.
+
+An anonymous, authentication-disabled check can observe removal of synthetic headers on that deployment; it does not qualify authenticated principal injection, group claims, access rules, or universal unforgeability across proxy configurations. Report the observed mode and route separately from untested authentication behavior. Do not describe a synthetic header test as authentication or authorization success; actual sign-in and application permission checks need their own approved verification.
+
 ## Manage desired variables
 
 Consult [application variables](https://builder.appservice.azure.com/docs/guides/variables/) and check `builder app version-config variables --help`, then the relevant command-specific help. If a command or flag is absent, report the installed CLI limitation rather than guessing a replacement.

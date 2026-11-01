@@ -95,6 +95,12 @@ builder login
 
 Use `--tenant` only when the user explicitly needs a specific Azure/Entra directory. It is an optional account selector, not a prerequisite for the normal sign-in flow. Recheck `builder account show` afterward.
 
+### Secure credential storage and browser sign-in
+
+Successful installation, version output, and CLI help do not prove that login works on that host. Builder's browser sign-in uses persistent secure credential storage. On Linux, a missing `libsecret` dependency or unavailable D-Bus Secret Service/keyring session can stop login before the browser prompt, including in a remote development environment. Report the actual credential-storage error separately from an Azure tenant/permission failure; changing tenants or repeatedly signing in is not a keyring repair.
+
+Stop the affected login/cloud workflow rather than disabling secure persistence, using an unencrypted token cache, copying tokens from another tool, or inventing a headless/device-code login option. Do not install dependencies or reconfigure OS/keyring services without explicit approval. Use a documented compatible host or offer the Portal workflow when appropriate; neither alternative proves CLI authentication succeeded on the original host. Local inspection and help remain usable while cloud authentication is blocked.
+
 ## Source authorization is separate
 
 This section applies only to GitHub-backed source. Skip GitHub sign-in and installation for local-directory/ZIP deployment; Azure management sign-in remains required. Inspect `gh auth status` and the selected repository's access without exposing credentials. When Builder source authorization is needed, consult help and use:
