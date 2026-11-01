@@ -154,6 +154,11 @@ Reading docs does not install a skill or verify a deployment. If you want mainta
 instructions discovered by the host, install the plugin below. To check whether
 the agent actually has the skill available, inspect the host's plugin/skill list;
 do not infer that it is installed or loaded because the agent read a docs page.
+If you skip or decline skill installation, continue with the public manifest and
+GitHub or ZIP deployment guides above. An agent may suggest the optional plugin,
+but must obtain your approval for the exact host and installation scope before
+changing plugin configuration; asking it to build or deploy is not installation
+approval.
 
 ### Agent skills: help your coding agent work with Builder
 

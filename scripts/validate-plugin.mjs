@@ -127,6 +127,8 @@ function checkGuidance(skillRoot) {
     ['references/operations.md', /changed intent needs a new ID/i, 'retry intent'],
     ['references/operations.md', /Do not promise universal cancellation/i, 'cancellation uncertainty'],
     ['SKILL.md', /public repository is the maintained customer skill home/i, 'public skill ownership'],
+    ['SKILL.md', /if the user skips or declines it, continue using the public docs/i, 'optional skill continuation'],
+    ['SKILL.md', /never run marketplace or plugin installation commands without the user's approval for the exact host and installation scope/i, 'skill installation consent'],
     ['references/prerequisites.md', /builder --help`[^]*builder manifest --help`[^]*command help before invocation/i, 'manifest capability discovery'],
     ['references/prerequisites.md', /If validation or a flag is unavailable[^.]*report the installed CLI limitation/i, 'missing validation capability'],
     ['references/prerequisites.md', /compatible \.NET 10 runtime is required only for local `builder manifest` commands/i, 'local manifest runtime prerequisite'],
@@ -402,6 +404,13 @@ export function validatePlugin(root = repositoryRoot) {
   assert(onboarding.includes('](https://builder.appservice.azure.com/docs/guides/deploy-zip-source/)'),
     'Missing novice ZIP walkthrough');
   const install = readFileSync(resolve(root, 'docs/agent-plugin.md'), 'utf8');
+  for (const path of ['docs/agent-plugin.md', 'docs/getting-started.md']) {
+    const content = readFileSync(resolve(root, path), 'utf8');
+    assert(/If you skip or decline skill installation, continue with the public manifest/i.test(content),
+      `Missing declined skill continuation: ${path}`);
+    assert(/must obtain your approval for the exact host and installation scope/i.test(content),
+      `Missing explicit plugin installation consent: ${path}`);
+  }
   assert(/public repository is the maintained customer skill home/i.test(install),
     'Installation docs must identify public skill ownership');
   for (const path of ['README.md', 'docs/agent-plugin.md', 'plugin/README.md']) {

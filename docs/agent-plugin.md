@@ -16,6 +16,8 @@ This public repository is the maintained customer skill home. The Builder CLI su
 
 None of these installations grants Azure or GitHub access. Reading public docs or the [skill instructions](../plugin/skills/app-service-builder/SKILL.md) does not install or load a skill, and installing CLI does not make a skill available to the agent. Verify discovery in the host rather than assuming a docs link activated the plugin.
 
+If you skip or decline skill installation, continue with the public manifest and deployment guides; missing optional agent instructions are not a deployment prerequisite. An agent may explain the plugin and show the commands below, but must obtain your approval for the exact host and installation scope before changing plugin configuration. A request to build or deploy an app is not approval to install a plugin.
+
 ## Install the plugin
 
 Use an installed host that supports plugins to install from this repository's marketplace:

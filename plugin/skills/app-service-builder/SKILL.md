@@ -9,6 +9,8 @@ Help customers use the `builder` CLI for **Private Preview development/test**, n
 
 This public repository is the maintained customer skill home; the CLI supplies existing-manifest validation and app operations, not a second skill installation route. No private checkout is required.
 
+Reading these linked instructions does not prove the skill is installed or loaded in the host. Skill installation is optional: if the user skips or declines it, continue using the public docs and relevant procedures rather than blocking app work. You may explain the plugin and show the documented host commands, but never run marketplace or plugin installation commands without the user's approval for the exact host and installation scope. A request to build or deploy an app does not authorize plugin installation.
+
 ## Before acting
 
 Use the [canonical product documentation](https://builder.appservice.azure.com/docs/) and check [current feature availability](https://builder.appservice.azure.com/docs/resources/feature-status/) before recommending a workflow. Maintained docs govern support, prerequisites, and limitations; bundled references provide procedure; installed CLI help verifies actual syntax. If docs and help disagree, surface the mismatch and do not guess. If docs cannot be fetched, disclose the gap and do not promote unqualified features. Public docs do not make the platform publicly available.

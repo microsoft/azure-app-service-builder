@@ -474,7 +474,33 @@ const unsafeGuidance = [
     '--settings "@<settings-json-path>"', '--file "<settings-json-path>"', /Missing variable input flags/],
   ['duplicate skill installation route', 'SKILL.md',
     '## Before acting', 'Run builder skills install first.\n\n## Before acting', /Duplicate skill installer/],
+  ['blocking users who decline the skill', 'SKILL.md',
+    'if the user skips or declines it, continue using the public docs',
+    'if the user declines it, stop all app work', /optional skill continuation/],
+  ['agent installing plugins without approval', 'SKILL.md',
+    "never run marketplace or plugin installation commands without the user's approval for the exact host and installation scope",
+    'automatically install the plugin before app work', /skill installation consent/],
 ];
+
+for (const file of ['docs/agent-plugin.md', 'docs/getting-started.md']) {
+  for (const [name, before, after, expected] of [
+    ['declined installation stops docs-only use',
+      'If you skip or decline skill installation, continue with the public manifest',
+      'If you decline skill installation, stop app work', /declined skill continuation/],
+    ['installation authorized by app work',
+      'must obtain your approval for the exact host and installation scope',
+      'may install automatically after a deployment request', /explicit plugin installation consent/],
+  ]) {
+    test(`rejects ${name} in ${file}`, (t) => {
+      const directory = fixture(t);
+      const path = resolve(directory, file);
+      const content = readFileSync(path, 'utf8');
+      assert(content.includes(before), `Mutation target not found: ${before}`);
+      writeFileSync(path, content.replace(before, after));
+      assert.throws(() => validatePlugin(directory), expected);
+    });
+  }
+}
 
 for (const [name, before, after, expected] of [
   ['requiring a skill for CLI-only use', 'no agent skill is required', 'the agent skill is required',
