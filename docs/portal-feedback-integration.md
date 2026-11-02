@@ -6,7 +6,7 @@ This guide defines the GitHub intake contract. It does not implement portal code
 
 ## Publication and access gates
 
-The repository is public. GitHub uses issue forms from the default branch (`main`). Repository visibility and feedback intake do not grant access to the App Service Builder Private Preview or announce public service availability.
+The repository is public. GitHub uses issue forms from the default branch (`main`). Repository visibility and feedback intake do not grant access to the App Service Builder Preview or announce public service availability.
 
 GitHub requires users to sign in to submit an issue. A public issue is attributable to its GitHub author and is not anonymous feedback. Anonymous portal feedback requires a separate mechanism; it must not silently become a public GitHub issue.
 

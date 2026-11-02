@@ -4,11 +4,42 @@ Consult maintained [source control](https://builder.appservice.azure.com/docs/gu
 
 ## Select and reconcile source
 
-Inspect the user's actual local code/manifest before Git initialization or account connection if useful. Before publishing or deploying edits, bind the exact intended app and Azure coordinates, canonical repository identity (including numeric ID), connected branch, source attachment root, and deliberately selected checkout. Inspect a credential-free origin and actual app source settings. Do not scan the user's disks for checkouts or reset, stash, or change branches without approval. Preserve dirty/unrelated work and review only the intended diff.
+Inspect the user's actual local code/manifest before Git initialization or account connection if useful. Before deploying, bind the exact intended app and Azure coordinates and choose GitHub source or local-directory/ZIP source. Do not scan the user's disks for checkouts or reset, stash, or change branches without approval. Preserve dirty/unrelated work and review only the intended diff.
+
+### GitHub source
+
+Verify canonical repository identity (including numeric ID), connected branch, source attachment root, and deliberately selected checkout. Inspect a credential-free origin and actual app source settings.
 
 Confirm intended changes are committed and pushed to the connected branch. Different local/remote SHAs alone do not establish ahead/behind: inspect ancestry against current remote evidence, distinguishing ahead, behind, and diverged histories. Distinguish a missing repository/ref from denied access (a not-found response can mask permissions) before suggesting a push. If access or ancestry is unknown, report that rather than overwriting remote work. Source publication needs its own authorization; local preview or plan approval is not permission to push.
 
 `builder.yaml` must exist at the source attachment root in the selected pushed revision. The attachment root and each component's `rootDirectory` differ: `rootDirectory` locates that component within the selected source. For example, attachment root `apps/store` and component root `web` select `apps/store/web`. Do not move the attachment root or reset the repository to a sample without agreement.
+
+### Local-directory/ZIP source
+
+Review the deliberately selected directory or archive, exact included files, and root `builder.yaml` instead of requiring a commit or push. ZIP deployment can include uncommitted local changes; disclose exactly what will be uploaded and exclude secrets and unrelated files. A component root remains relative to that selected source root. An existing ZIP must have `builder.yaml` at its archive root, with no enclosing parent folder; the separate `--manifest` file must match its bytes exactly. See [local ZIP deployment](deployment.md#deploy-local-directory-or-zip-source) for packaging and limits.
+
+### Source input is not static publication output
+
+| Directory or setting | Purpose |
+| --- | --- |
+| App source root | Contains `builder.yaml` and required source, dependency/lock, and build inputs |
+| Component `rootDirectory` | Selects that component's source directory inside the app source root |
+| Static component `output` | Selects public files to publish, not the source ZIP; for custom builds it resolves beneath `$DESTINATION_DIR` |
+| HTTP build output | Complete runnable files under `$DESTINATION_DIR`; static `output` does not select a web document root |
+
+For browser-ready files already in `public/`, this manifest publishes that directory without a build:
+
+```yaml
+components:
+  - name: site
+    role: static
+    output: public
+    path: /
+```
+
+The source still includes root `builder.yaml` and `public/`. Use `output: .` only when that component root intentionally contains public assets, not the whole application repository. For a custom static build, keep its required source/package/lock files in the upload, stage generated browser files under `$DESTINATION_DIR`, and select that output with the component's `output` field; follow the [custom build recipe](https://builder.appservice.azure.com/docs/guides/builder-yaml/#override-the-build-correctly). Do not upload only `dist` unless it is deliberately prepared as complete browser-ready source with its own valid root manifest.
+
+A static-publication error does not prove that the source ZIP should contain only build output, that a file limit was exceeded, or that the runtime cannot start. Inspect the actual generated output and failing stage before changing the manifest or source selection; see [stage-aware diagnostics](operations.md#inspect-apps-and-history).
 
 ## Validate builder.yaml
 

@@ -4,7 +4,16 @@ First complete [readiness](prerequisites.md) and inspect [source and builder.yam
 
 Consult maintained [deployments and versions](https://builder.appservice.azure.com/docs/guides/deployments/), [source control](https://builder.appservice.azure.com/docs/guides/source-control/), and the [CLI reference](https://builder.appservice.azure.com/docs/reference/builder-cli/). Check current [feature availability](https://builder.appservice.azure.com/docs/resources/feature-status/) before recommending a workflow; confirm installed help rather than guessing syntax when versions differ.
 
-## Initialize interactively
+## Choose the source workflow
+
+| Source | Setup and access |
+| --- | --- |
+| GitHub pushed source | Use `builder init` from the app's Git worktree; verify GitHub user authorization and GitHub App access to the exact repository |
+| Local directory or ZIP | Use CLI 0.0.2 or compatible later help; create or reuse an app without connecting GitHub, then explicitly upload source |
+
+Do not make a CLI-only user install an agent skill, and do not make a ZIP-only user authorize GitHub. Both paths still need Azure management access, a valid source-root `builder.yaml` for deployment, and separate approval for creation and deployment. ZIP source is built by Builder, not uploaded as ready-to-run output. Portal ZIP deployment is not available.
+
+## Initialize GitHub source interactively
 
 Run initialization from inside an initialized Git worktree for the user's selected app. GitHub sign-in does not select a local repository. Open the app's cloned checkout or change to that directory first; use `git rev-parse --show-toplevel` to verify the location if needed. Do not initialize Git in your home directory to get past the worktree error.
 
@@ -48,7 +57,7 @@ builder app deploy --name "<app-name>" --subscription "<subscription-id>" --reso
 
 Deployment waits by default. If a status read fails, including HTTP 429, follow [uncertain-write reconciliation](operations.md#uncertain-writes-and-retries) before considering another deployment. A failed local wait does not establish that the server operation failed.
 
-Use at most one selector:
+For GitHub or retained-version deployment, use at most one selector:
 
 | Selector | Requested content |
 | --- | --- |
@@ -70,6 +79,44 @@ builder app status "<operation-url>" --subscription "<subscription-id>" --wait -
 
 The operation URL must be the actual returned service value under the approved connection settings. Do not fabricate it, send credentials to an untrusted URL, or treat request acceptance as completion.
 
+## Deploy local directory or ZIP source
+
+Read the [CLI ZIP walkthrough](https://builder.appservice.azure.com/docs/guides/deploy-zip-source/) and `builder app create --help` / `builder app deploy --help`. Verify `--source`, or `--source-archive` with `--manifest`, in the installed release. Missing options require an explicitly approved upgrade, not guessed commands.
+
+For a new app, create only the confirmed Azure target:
+
+```shell
+builder app create --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --location "<app-location>" --json
+```
+
+Reuse an existing app when that is the intended target. A ZIP-only app can remain `sourceIntegrationState: "NotConfigured"`; do not install the GitHub App or run Git-backed `init` to fix that expected state.
+
+Before uploading, review every included file and obtain approval for the exact source and cloud action. Directory packaging excludes `.git` but does not apply `.gitignore` or automatically exclude `.env`, credentials, dependency caches, or unrelated files. Use a reviewed clean staging directory when necessary; never delete or overwrite the user's originals. Packaging rejects symlinks and special files. Put `builder.yaml` at the selected source root:
+
+```shell
+builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --source "<reviewed-source-directory>" --json
+```
+
+For a subdirectory, the optional `--root-directory` selects a safe directory within `--source`; it is valid only with directory input. The selected directory becomes the ZIP root. This does not change a durable GitHub source attachment root.
+
+Alternatively, upload an existing ZIP unchanged:
+
+```shell
+builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --source-archive "<source-zip-path>" --manifest "<matching-builder-yaml-path>" --json
+```
+
+The ZIP must contain root `builder.yaml`, not a parent-folder wrapper. The separate planning manifest must match it byte for byte, including line endings and any BOM. Recreate the ZIP after manifest changes. The compressed limit is **100 MiB** and the UTF-8 manifest limit is **1 MiB**. Directory packaging supports at most 65,535 files, each smaller than 4 GiB; use a reviewed externally created ZIP64 archive for larger input within the compressed limit. POSIX packaging preserves ordinary executable bits; Windows packaging does not, so use a POSIX-created archive when executable permissions matter.
+
+Do not combine either upload selector with `--commit`, `--rebuild`, `--version`, `--previous`, or the other upload selector. Uploading source does not replace or remove an existing durable GitHub connection. To deploy later local changes, supply the upload selector again; omitting it selects configured GitHub source, not the last local directory. Retained-version activation is a separate inspected action.
+
+Keep the actual `requestId`, archive digest, returned operation URL, and version/deployment IDs for recovery. An accepted upload is not a build or deployment success. `SourceUploadDisabled` means the target does not support upload; stop that workflow rather than changing access or silently switching source. Invalid archives and manifest mismatches require corrected packaging, not repeated identical deployments. If observation is interrupted, reconcile the existing operation and app history read-only before retrying the same intent with the same request ID. Changed source/archive bytes are new intent and need a new ID.
+
+## Automation and CI/CD requests
+
+Native GitHub push deployment and an explicit deployment invoked by a customer-owned workflow are different mechanisms. Keep native push deployment off while current availability marks it not ready. ZIP flags alone do not establish unattended CI authentication. Before proposing GitHub Actions YAML, locate the current published workflow and authentication guidance for the selected target. Use the CLI/ARM guides to verify source format, target, token audience, idempotency, and completion checks; do not invent a service-principal login option, secret transfer, or a workflow from internal-only instructions.
+
+If the published guidance does not establish the requested automation/authentication path, explain that specific documentation gap rather than claiming all CI/CD is unsupported or asking the user to reverse-engineer product source. Preserve existing workflows, branch protection, and repository rulesets; do not disable them to bypass source publication or deployment errors. Diagnose the reported GitHub permission/ruleset error separately from Builder source installation access.
+
 ## Verify service behavior
 
 Inspect the deployed app:
@@ -79,6 +126,8 @@ builder app show --name "<app-name>" --subscription "<subscription-id>" --resour
 ```
 
 Distinguish the observed branch SHA, requested commit, built version, activation attempt, active version/deployment, and real HTTP/health response. A moving branch or newer failed attempt does not identify what currently serves.
+
+For ZIP versions, inspect `source.kind` / `source.provider: "uploadedArtifact"` and `source.revision`, which is the archive SHA-256, not a Git commit. Compare the actual uploaded digest and active version; do not require local/remote commit equality for this workflow.
 
 Read the **returned runtime URL**, app state, and actual deployed version. Never synthesize a hostname. Use the user's available HTTP/browser tooling to check real HTTP behavior and the configured app-owned health endpoint, with the app's expected access requirements. Do not guess a `/health` route or confuse management login with visitor sign-in.
 
