@@ -92,8 +92,7 @@ only for GitHub source operations, not local-directory/ZIP deployment.
 
 1. Download the `azure-builder-cli-<version>.tgz` asset from the
    [Builder CLI 0.0.2 release](https://github.com/microsoft/azure-app-service-builder/releases/tag/builder-cli-v0.0.2-preview.1).
-   Choose `azure-builder-cli-0.0.2.tgz` and verify it against the companion
-   `.sha256` asset using [checksum guidance](../plugin/skills/app-service-builder/references/prerequisites.md#match-the-users-platform).
+   Choose `azure-builder-cli-0.0.2.tgz`.
    Do not extract it or use GitHub's automatic source-code archives.
 2. Install the downloaded file and check the command:
 

@@ -8,9 +8,9 @@ Consult [Private Preview guidance](https://builder.appservice.azure.com/docs/res
 
 Use an already-installed official `builder` CLI when available. Otherwise obtain the portable `azure-builder-cli-<version>.tgz` archive from the [official CLI releases](https://github.com/microsoft/azure-app-service-builder/releases) and follow the [Builder CLI quickstart](https://builder.appservice.azure.com/docs/quickstarts/builder-cli/). Use the same archive on Windows, Linux, and macOS with Node.js 22 or later, including npm.
 
-Use the CLI release asset, not GitHub's automatic source-code ZIP or tarball. When an agent downloads the CLI for a user, compare it with the provided published SHA-256 checksum before installing and stop on a mismatch. If the asset or trusted checksum cannot be found, report the exact missing release artifact and link to the official releases page rather than guessing a version or download URL.
+Use the CLI release asset, not GitHub's automatic source-code ZIP or tarball. If the asset is unavailable, report the exact missing release artifact and link to the official releases page rather than guessing a version or download URL.
 
-The CLI 0.0.2 preview assets are the [portable CLI archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz) and its [SHA-256 checksum](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz.sha256). Local-directory/ZIP deployment requires 0.0.2 or a compatible later release; inspect installed help before choosing it.
+Download the [CLI 0.0.2 preview archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz). Local-directory/ZIP deployment requires 0.0.2 or a compatible later release; inspect installed help before choosing it.
 
 After approval to install the downloaded archive:
 
@@ -22,11 +22,7 @@ builder --help
 
 Use the actual approved local file, not the placeholder path. Do not extract the archive, guess a registry package or download URL, or install/upgrade tooling automatically. npm still needs registry access for JavaScript dependencies.
 
-### Match the user's platform
-
-Detect the operating system and active shell before choosing commands. Use PowerShell-compatible commands on Windows and POSIX commands only in an actual POSIX shell; do not require WSL, Bash, `sha256sum`, or `jq` just to install the portable CLI. Quote paths with spaces, including Windows paths. Use separate commands when shell chaining syntax is unavailable.
-
-Checksum verification must compare the archive's SHA-256 with the trusted published digest, not the checksum file's own hash. GitHub release asset metadata may include the archive digest. If using the companion checksum file, accept LF or CRLF and parse its 64-hex-digit digest rather than comparing the entire line or executing its contents. Use available native hashing tools (PowerShell `Get-FileHash`, macOS `shasum -a 256`, Linux `sha256sum`) or Node's built-in crypto; no extra package is needed. A formatting difference is not a hash mismatch; an actual mismatch stops installation.
+Detect the operating system and active shell before choosing commands. Use PowerShell-compatible commands on Windows and POSIX commands only in an actual POSIX shell. Quote paths with spaces, including Windows paths. Use separate commands when shell chaining syntax is unavailable.
 
 A compatible .NET 10 runtime is required only for local `builder manifest` commands. Login, initialization, and deployment work without .NET. The analyzer is included in the archive and does not require a separate installation. Its generated `Embr.BuildAnalyzer.runtimeconfig.json` specifies the runtime requirement; a .NET SDK is not required.
 

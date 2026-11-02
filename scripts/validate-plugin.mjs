@@ -61,7 +61,6 @@ function checkGuidance(skillRoot) {
     ['references/prerequisites.md', /Azure CLI is unavailable[^]*Do not install Azure CLI just for discovery/i, 'optional Azure CLI discovery'],
     ['references/prerequisites.md', /List or read resource groups[^.]*before provisioning an app/i, 'resource-group discovery'],
     ['references/prerequisites.md', /not the resource group's metadata location/i, 'app versus group region'],
-    ['references/prerequisites.md', /accept LF or CRLF[^.]*64-hex-digit digest/i, 'portable checksum handling'],
     ['references/prerequisites.md', /PowerShell-compatible commands on Windows[^.]*POSIX commands only in an actual POSIX shell/i, 'platform shell selection'],
     ['references/prerequisites.md', /Multiple saved accounts are not themselves an error/i, 'account-aware source access'],
     ['references/prerequisites.md', /REST response's numeric `id`[^.]*not the GraphQL\/node ID/i, 'numeric repository identity'],
@@ -390,7 +389,6 @@ export function validatePlugin(root = repositoryRoot) {
   const prereqs = readFileSync(resolve(skillRoot, 'references/prerequisites.md'), 'utf8');
   assert(/stop deployment/i.test(prereqs) && /already-installed official/.test(prereqs),
     'Missing prerequisite stop/approved CLI guardrails');
-  assert(prereqs.includes('published SHA-256 checksum'), 'Missing archive checksum verification');
   checkGuidance(skillRoot);
   for (const path of ['README.md', 'docs/agent-plugin.md', 'docs/getting-started.md']) {
     const content = readFileSync(resolve(root, path), 'utf8');

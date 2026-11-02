@@ -178,13 +178,13 @@ test('customer CLI installation uses the downloaded archive and checks the versi
   assert.match(install, /npm install --global "<path-to-downloaded-file\.tgz>"\r?\nbuilder --version/);
 });
 
-test('rejects removing archive checksum guidance from agent prerequisites', (t) => {
-  const directory = fixture(t);
-  const path = resolve(directory, 'plugin/skills/app-service-builder/references/prerequisites.md');
-  writeFileSync(path, readFileSync(path, 'utf8').replace(
-    'published SHA-256 checksum', 'unverified download'));
-  assert.throws(() => validatePlugin(directory), /Missing archive checksum verification/);
-});
+for (const file of ['CONTRIBUTING.md', 'docs/agent-plugin.md', 'docs/getting-started.md',
+  'plugin/skills/app-service-builder/references/prerequisites.md']) {
+  test(`CLI installation omits checksum detours in ${file}`, () => {
+    const install = readFileSync(resolve(root, file), 'utf8').split('### Builder canvas:')[0];
+    assert.doesNotMatch(install, /checksum|SHA-?256|Get-FileHash|shasum|sha256sum|match-the-users-platform/i);
+  });
+}
 
 for (const file of ['docs/agent-plugin.md', 'plugin/README.md', 'CONTRIBUTING.md']) {
   test(`rejects removing canonical CLI installation guidance in ${file}`, (t) => {
@@ -268,8 +268,6 @@ const unsafeGuidance = [
     'List or read resource groups', 'Guess resource groups', /resource-group discovery/],
   ['inferring app region from group metadata', 'references/prerequisites.md',
     "not the resource group's metadata location", "always the resource group's metadata location", /app versus group region/],
-  ['nonportable checksum parsing', 'references/prerequisites.md',
-    'accept LF or CRLF', 'reject CRLF', /portable checksum handling/],
   ['POSIX-only Windows setup', 'references/prerequisites.md',
     'PowerShell-compatible commands on Windows', 'Bash commands on Windows', /platform shell selection/],
   ['treating multiple GitHub accounts as failure', 'references/prerequisites.md',
