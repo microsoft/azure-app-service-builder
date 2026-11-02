@@ -1,6 +1,6 @@
 # App Service Builder agent plugin
 
-The `builder` plugin provides the `app-service-builder` skill for GitHub Copilot CLI and Claude Code, for authorized **Private Preview development/test, not production** use.
+The `builder` plugin provides the `app-service-builder` skill for GitHub Copilot CLI and Claude Code, for authorized **Preview development/test, not production** use.
 
 Version 0.1.4 adds workflow-specific GitHub App consent and CLI 0.0.2 local-directory/ZIP guidance, and aligns the [existing-model connection workflow](skills/app-service-builder/references/model-services.md) with documented Portal/ARM managed identity. It preserves discovery-first setup, partial-success recovery, variable-exposure limits, and deployed integration verification; it does not add platform features.
 

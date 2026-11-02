@@ -2,7 +2,7 @@
 
 This repository is the customer resource and product feedback hub for Azure App Service Builder. Feedback can cover the whole product. This is not the product source code repository or a replacement for Azure Support.
 
-App Service Builder is in **Private Preview for development/test, not production**. This public resource hub does not grant preview access or announce public service availability. See the [App Service Builder documentation](https://builder.appservice.azure.com/docs/) for product instructions, prerequisites, and limitations.
+App Service Builder is in **Preview for development/test, not production**. This public resource hub does not grant preview access or announce public service availability. See the [App Service Builder documentation](https://builder.appservice.azure.com/docs/) for product instructions, prerequisites, and limitations.
 
 ## Agent skills plugin
 

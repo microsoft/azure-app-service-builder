@@ -4,7 +4,7 @@
     "name": "Microsoft"
   },
   "metadata": {
-    "description": "Customer-facing App Service Builder agent skills for authorized Private Preview users.",
+    "description": "Customer-facing App Service Builder agent skills for authorized Preview users.",
     "version": "0.1.4"
   },
   "plugins": [

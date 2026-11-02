@@ -1,11 +1,11 @@
 ---
 name: app-service-builder
-description: "Use for explicit App Service Builder requests: discover setup context, check builder.yaml, choose GitHub or local ZIP source, recover GitHub App access, connect an app to an existing model service with managed identity or an approved credential, deploy, manage variables, inspect history, or recover a retained version. For Private Preview development/test. Assume users have platform access and use their provided environment. Not for ordinary Azure App Service, Azure Container Apps, or internal platform operations. A generic 'deploy my app' request must first select the product and target."
+description: "Use for explicit App Service Builder requests: discover setup context, check builder.yaml, choose GitHub or local ZIP source, recover GitHub App access, connect an app to an existing model service with managed identity or an approved credential, deploy, manage variables, inspect history, or recover a retained version. For Preview development/test. Assume users have platform access and use their provided environment. Not for ordinary Azure App Service, Azure Container Apps, or internal platform operations. A generic 'deploy my app' request must first select the product and target."
 ---
 
 # App Service Builder
 
-Help customers use the `builder` CLI for **Private Preview development/test**, not production. Plugin installation does not install the CLI or grant Azure/GitHub permissions.
+Help customers use the `builder` CLI for **Preview development/test**, not production. Plugin installation does not install the CLI or grant Azure/GitHub permissions.
 
 This public repository is the maintained customer skill home; the CLI supplies existing-manifest validation and app operations, not a second skill installation route. No private checkout is required.
 

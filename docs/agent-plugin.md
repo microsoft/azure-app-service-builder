@@ -1,6 +1,6 @@
 # App Service Builder agent plugin
 
-The `builder` plugin provides one customer-facing skill, `app-service-builder`, for authorized App Service Builder **Private Preview development/test** use. It is instructions and focused references only: no hooks, new MCP servers, VS Code extension, or Copilot app canvas.
+The `builder` plugin provides one customer-facing skill, `app-service-builder`, for authorized App Service Builder **Preview development/test** use. It is instructions and focused references only: no hooks, new MCP servers, VS Code extension, or Copilot app canvas.
 
 Plugin distribution does not grant preview access or announce public service availability. It is a repository-hosted marketplace, not admission to a curated plugin directory.
 
@@ -73,7 +73,7 @@ Access to the selected subscription, an existing resource group for CLI setup, a
 
 Installation/help success does not prove browser login works: Linux or remote hosts can fail before sign-in when secure credential storage (`libsecret` or the D-Bus keyring session) is unavailable. Follow [credential-storage readiness](../plugin/skills/app-service-builder/references/prerequisites.md#secure-credential-storage-and-browser-sign-in); do not disable secure caching or assume an undocumented headless login fallback.
 
-The [canonical product docs](https://builder.appservice.azure.com/docs/) and [current feature availability](https://builder.appservice.azure.com/docs/resources/feature-status/) govern support, prerequisites, and limitations. The skill consults maintained docs first, uses bundled procedures, and checks installed CLI help for syntax. Public documentation does not change Private Preview access. Local code/manifest inspection can happen before Git initialization or account connection; cloud actions remain gated on readiness and their own scope.
+The [canonical product docs](https://builder.appservice.azure.com/docs/) and [current feature availability](https://builder.appservice.azure.com/docs/resources/feature-status/) govern support, prerequisites, and limitations. The skill consults maintained docs first, uses bundled procedures, and checks installed CLI help for syntax. Public documentation does not change Preview access. Local code/manifest inspection can happen before Git initialization or account connection; cloud actions remain gated on readiness and their own scope.
 
 The [skill](../plugin/skills/app-service-builder/SKILL.md) includes self-contained [readiness](../plugin/skills/app-service-builder/references/prerequisites.md), [source](../plugin/skills/app-service-builder/references/source-and-manifest.md), [model-service integration](../plugin/skills/app-service-builder/references/model-services.md), [deployment](../plugin/skills/app-service-builder/references/deployment.md), and [operations](../plugin/skills/app-service-builder/references/operations.md) references. Unsupported or unqualified workflows must not be inferred from the existence of this plugin.
 

@@ -1,6 +1,6 @@
 # Getting started with App Service Builder
 
-> **Private Preview guide - updated October 31, 2026.**
+> **Preview guide - updated October 31, 2026.**
 > This guide is for invited MVP, 1P, and external participants whose subscriptions have been
 > enabled. It does not grant preview access or announce public availability.
 > Feature availability and feedback instructions below apply to this cohort.
@@ -25,13 +25,13 @@ Documentation is linked from the portal and available directly at
 [documented sample](https://builder.appservice.azure.com/docs/samples/) to explore
 the deployment experience.
 
-This is **Private Preview for development and testing, not production
+This is **Preview for development and testing, not production
 workloads**. Use disposable test apps. Avoid sensitive data and never include
 secrets in screenshots, logs, or feedback.
 
-## Private Preview pricing and limits
+## Preview pricing and limits
 
-**App Service Builder is free during Private Preview.** Resource and usage limits
+**App Service Builder is free during Preview.** Resource and usage limits
 apply to prevent abuse and keep capacity available for participants. Free access
 does not mean unlimited usage.
 
@@ -273,8 +273,8 @@ team:
 | **General** | Announcements, updates, and newly available features. Keep an eye on this channel! |
 
 **Do not use GitHub feedback templates or feedback links/buttons in the portal
-or canvas for this cohort.** Those routes are public-facing; we want all private
-preview feedback kept within the App Service Builder Community team for now. **This overrides the
+or canvas for this cohort.** Those routes are public-facing; we want all preview
+feedback kept within the App Service Builder Community team for now. **This overrides the
 general feedback instructions in the public repository and download guides for
 these participants only.**
 

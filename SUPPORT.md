@@ -4,7 +4,7 @@
 
 Use [GitHub Issues](https://github.com/microsoft/azure-app-service-builder/issues) for general product feedback, feature requests, reproducible bugs, and questions that can be discussed publicly. Feedback is welcome across the product. [Search existing issues](https://github.com/microsoft/azure-app-service-builder/issues?q=is%3Aissue) first, then select the appropriate [feedback form](https://github.com/microsoft/azure-app-service-builder/issues/new/choose).
 
-App Service Builder is in Private Preview for development/test, not production. This repository is public, but feedback intake and plugin installation do not grant preview access or establish service qualification.
+App Service Builder is in Preview for development/test, not production. This repository is public, but feedback intake and plugin installation do not grant preview access or establish service qualification.
 
 ## Temporary App Service Builder support
 

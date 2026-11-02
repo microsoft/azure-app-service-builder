@@ -31,6 +31,19 @@ test('valid package resolves the shared skill through both hosts', () => {
   });
 });
 
+test('maintained customer guidance and metadata use Preview stage terminology', () => {
+  for (const file of ['README.md', 'SUPPORT.md', 'docs/portal-feedback-integration.md',
+    'docs/getting-started.md', 'docs/agent-plugin.md', 'plugin/README.md',
+    '.claude-plugin/marketplace.json', 'plugin/plugin.json', 'plugin/.claude-plugin/plugin.json',
+    'plugin/skills/app-service-builder/SKILL.md',
+    'plugin/skills/app-service-builder/references/prerequisites.md',
+    'plugin/skills/app-service-builder/references/model-services.md']) {
+    const content = readFileSync(resolve(root, file), 'utf8');
+    assert.match(content, /\bPreview\b/, file);
+    assert.doesNotMatch(content, /private[\s-]+preview/i, file);
+  }
+});
+
 test('customer sign-in and initialization use the default commands from an app checkout', () => {
   const prereqs = readFileSync(resolve(root, 'plugin/skills/app-service-builder/references/prerequisites.md'), 'utf8');
   const deployment = readFileSync(resolve(root, 'plugin/skills/app-service-builder/references/deployment.md'), 'utf8');

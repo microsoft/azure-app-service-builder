@@ -1,8 +1,8 @@
 # Prerequisites and readiness
 
-App Service Builder is a **Private Preview** for **development/test**, not production. Establish readiness from installed tooling, selected resources, and actual access checks, not an eligibility questionnaire.
+App Service Builder is in **Preview** for **development/test**, not production. Establish readiness from installed tooling, selected resources, and actual access checks, not an eligibility questionnaire.
 
-Consult [Private Preview guidance](https://builder.appservice.azure.com/docs/resources/preview/) for prerequisites and limitations; check [feature availability](https://builder.appservice.azure.com/docs/resources/feature-status/) before recommending a workflow. Verify command syntax against the [CLI reference](https://builder.appservice.azure.com/docs/reference/builder-cli/) and installed help. Report disagreements or unavailable docs rather than guessing feature support.
+Consult [Preview guidance](https://builder.appservice.azure.com/docs/resources/preview/) for prerequisites and limitations; check [feature availability](https://builder.appservice.azure.com/docs/resources/feature-status/) before recommending a workflow. Verify command syntax against the [CLI reference](https://builder.appservice.azure.com/docs/reference/builder-cli/) and installed help. Report disagreements or unavailable docs rather than guessing feature support.
 
 ## Install Builder CLI
 

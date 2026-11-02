@@ -328,7 +328,7 @@ export function validatePlugin(root = repositoryRoot) {
   const description = JSON.parse(frontmatter[2]);
   text(description, 'skill description');
   assert(description.length <= 1024, 'Skill description is too long');
-  for (const trigger of ['App Service Builder', 'Private Preview', 'App Service', 'Container Apps']) {
+  for (const trigger of ['App Service Builder', 'Preview', 'App Service', 'Container Apps']) {
     assert(description.includes(trigger), `Missing skill scope: ${trigger}`);
   }
   for (const reference of referenceNames) {
