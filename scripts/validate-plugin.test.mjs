@@ -173,6 +173,8 @@ for (const file of ['docs/agent-plugin.md', 'plugin/skills/app-service-builder/r
 test('customer CLI installation uses the downloaded archive and checks the version', () => {
   const install = readFileSync(resolve(root, 'docs/agent-plugin.md'), 'utf8')
     .split('## Package layout and local checks')[0];
+  assert.equal(install.split('\n').find((line) => line.startsWith('Download the ')),
+    'Download the [CLI 0.0.2 preview archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz).');
   assert.match(install, /npm install --global "<path-to-downloaded-file\.tgz>"\r?\nbuilder --version/);
 });
 

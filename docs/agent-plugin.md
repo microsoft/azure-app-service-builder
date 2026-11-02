@@ -49,7 +49,7 @@ Obtain the portable `azure-builder-cli-<version>.tgz` archive from the [official
 
 Use the CLI release asset, not GitHub's automatic source-code ZIP or tarball. If an asset is unavailable, report the exact missing release artifact and link to the official releases page rather than guessing a version or download URL.
 
-Download the [CLI 0.0.2 preview archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz) and its [SHA-256 checksum](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz.sha256). Verify the archive against that published digest before installation; use [platform-specific verification guidance](../plugin/skills/app-service-builder/references/prerequisites.md#match-the-users-platform).
+Download the [CLI 0.0.2 preview archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz).
 
 Install the downloaded local archive, with the user's approval:
 
