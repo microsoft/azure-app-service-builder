@@ -91,10 +91,10 @@ The documented preview allowances are:
 
 | Resource or operation | Limit |
 | --- | --- |
-| Builder Apps per Azure subscription | 5 |
+| Builder Apps per Azure subscription | 15 |
 | Compute size | `small` |
 | Maximum replicas per app | 2 |
-| Maximum replicas across the subscription | 10 |
+| Maximum replicas across the subscription | 30 |
 | Concurrent builds per app | 1 |
 | Concurrent builds across the subscription | 2 |
 | Build-start allowance per app | Up to 10 starts; refills at 10 per hour |
