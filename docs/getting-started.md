@@ -1,6 +1,6 @@
 # Getting started with App Service Builder
 
-> **Preview guide - updated November 9, 2026.**
+> **Preview guide - updated November 10, 2026.**
 > App Service Builder is open to everyone with an Azure subscription during preview,
 > subject to usage limits and regional availability. No invitation is required.
 
@@ -24,9 +24,10 @@ own app**.
 | Use a native visual panel alongside chat | [Check Builder canvas host compatibility](#builder-canvas-a-guided-visual-experience-in-a-compatible-host). |
 
 Open **https://builder.appservice.azure.com/**, sign in with your Azure account,
-and select your subscription. Choose an
-[available Builder location](https://builder.appservice.azure.com/docs/resources/regions/)
-when creating your app.
+and select your subscription. Target **West US 2 (`westus2`) only**, the
+[available Builder location](https://builder.appservice.azure.com/docs/resources/regions/),
+when creating your app. A resource group's metadata location does not select
+the app's region.
 
 Documentation is linked from the portal and available directly at
 **https://builder.appservice.azure.com/docs/**. Start with a small app or a
@@ -64,7 +65,7 @@ access. If you prefer not to connect GitHub, use the
 4. In **Authentication**, review visitor sign-in; select **Off** only if you
    intend to allow anonymous visitors. Managed identity is separate and is
    configured after creation from the app's **Identity** page. Choose your app name,
-   subscription, resource group, and an available app region. On **Review and
+   subscription, resource group, and **West US 2** app region. On **Review and
    create**, confirm the source and Azure target, then select **Create and deploy**.
 5. Wait for **Deployments** to show success. Check the active version and source
    revision, then use **Browse** to open the app. For the unmodified Node.js
@@ -157,7 +158,7 @@ only for GitHub source operations, not local-directory/ZIP deployment.
 3. Follow the [GitHub CLI quickstart](https://builder.appservice.azure.com/docs/quickstarts/builder-cli/)
    or the [local ZIP walkthrough](https://builder.appservice.azure.com/docs/guides/deploy-zip-source/).
    Both need Azure sign-in, permission to manage Builder apps, an existing resource
-   group, and an [available Builder location](https://builder.appservice.azure.com/docs/resources/regions/).
+   group, and **West US 2 (`westus2`)**, the [available Builder location](https://builder.appservice.azure.com/docs/resources/regions/).
    Local-directory/ZIP deployment does not require GitHub sign-in or installation
    of the GitHub App. It uploads source to build, not a ready-to-run package;
    when providing your own `builder.yaml`, include it at the selected source root.
@@ -308,11 +309,15 @@ You can write `builder.yaml` using the documented examples, adapt one from a
 matching [sample](https://builder.appservice.azure.com/docs/samples/), or ask your
 coding agent to generate one after inspecting your app. Review the proposed
 configuration before using it; preserve your existing source and build scripts.
-`builder init` does not generate it, and `builder manifest validate` only checks
-an existing file. These local CLI commands are separate from platform generation.
+`builder app create` does not generate it (`builder init` does not generate it
+in older clients either), and `builder manifest validate` only checks an existing
+file. These local CLI commands are separate from platform generation.
 
-**If you do not provide `builder.yaml`, the platform makes a best-effort attempt
-to generate one for you.** The generator currently handles only limited cases;
+**For GitHub source without `builder.yaml`, the platform makes a best-effort
+attempt to generate one for you where available. ZIP uploads always require
+root `builder.yaml`; generation does not apply to ZIP source.** Check the current
+[manifest guide](https://builder.appservice.azure.com/docs/guides/builder-yaml/#if-you-dont-provide-builderyaml)
+and feature availability if published pages disagree. The generator handles only limited cases;
 it is not guaranteed to produce a working configuration for your app. If it
 cannot generate a working manifest, or the generated configuration fails during
 build or deployment, you receive an error. Inspect that error and the build or
@@ -339,7 +344,7 @@ the manifest; ZIP source is built by Builder.
 
 For static publication, the component's `output` selects only public browser
 assets, not the whole repository. A source ZIP needs the required source/build
-inputs; when supplying your own manifest, put `builder.yaml` at the archive root.
+inputs and always requires `builder.yaml` at the archive root.
 See [source versus published output](../plugin/skills/app-service-builder/references/source-and-manifest.md#source-input-is-not-static-publication-output)
 for a browser-ready example and custom-build guidance. A generic static upload
 error is not proof of a file limit or a startup/port problem; inspect the version

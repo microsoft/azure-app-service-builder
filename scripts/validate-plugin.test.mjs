@@ -27,7 +27,7 @@ function editJson(directory, path, edit) {
 
 test('valid package resolves the shared skill through both hosts', () => {
   assert.deepEqual(validatePlugin(), {
-    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.4', skills: 1,
+    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.5', skills: 1,
   });
 });
 
@@ -44,11 +44,13 @@ test('maintained customer guidance and metadata use Preview stage terminology', 
   }
 });
 
-test('customer sign-in and initialization use the default commands from an app checkout', () => {
+test('customer setup uses guided creation and scopes init to older CLI compatibility', () => {
   const prereqs = readFileSync(resolve(root, 'plugin/skills/app-service-builder/references/prerequisites.md'), 'utf8');
   const deployment = readFileSync(resolve(root, 'plugin/skills/app-service-builder/references/deployment.md'), 'utf8');
   assert.match(prereqs, /^builder login\r?$/m);
   assert.doesNotMatch(prereqs, /^builder login .*--tenant/m);
+  assert.match(deployment, /^builder app create\r?$/m);
+  assert.match(deployment, /Only if installed help still exposes `builder init`/);
   assert.match(deployment, /^builder init\r?$/m);
   assert.match(deployment, /inside an initialized Git worktree/);
   assert.match(deployment, /GitHub sign-in does not select a local repository/);
@@ -60,7 +62,7 @@ for (const [name, ending] of [['LF', '\n'], ['CRLF', '\r\n']]) {
     const directory = fixture(t);
     const file = resolve(directory, 'plugin/skills/app-service-builder/SKILL.md');
     writeFileSync(file, readFileSync(file, 'utf8').replaceAll('\r\n', '\n').replaceAll('\n', ending));
-    assert.equal(validatePlugin(directory).version, '0.1.4');
+    assert.equal(validatePlugin(directory).version, '0.1.5');
   });
 }
 
@@ -168,7 +170,7 @@ for (const suffix of ['.tgz', '.tgz.sha256']) {
     const path = resolve(directory, 'docs/agent-plugin.md');
     const url = `https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1-preview.1/azure-builder-cli-0.0.1${suffix}`;
     writeFileSync(path, readFileSync(path, 'utf8') + `\n[Approved release asset](${url})\n`);
-    assert.equal(validatePlugin(directory).version, '0.1.4');
+    assert.equal(validatePlugin(directory).version, '0.1.5');
   });
 }
 
@@ -257,6 +259,32 @@ for (const field of ['--proposal-id', '--repair-id', '--resolution', 'ProposalId
 
 const skillRoot = 'plugin/skills/app-service-builder/';
 const unsafeGuidance = [
+  ['wrong customer target region', 'SKILL.md',
+    'Target **West US 2 (`westus2`) only**', 'Target any region', /West US 2 target/],
+  ['wrong region discovery', 'references/prerequisites.md',
+    'Target **West US 2 (`westus2`) only**', 'Choose any provider region', /West US 2 discovery/],
+  ['implicit automatic deployment', 'references/deployment.md',
+    'connecting source alone does not enable it', 'connecting source automatically enables it', /push deployment opt-in/],
+  ['deploying every waiting push', 'references/deployment.md',
+    'newer eligible waiting commits replace older waiting commits', 'every waiting commit must deploy', /push queue semantics/],
+  ['removed setup version check', 'references/deployment.md',
+    'Newer clients replace `builder init`', 'Always run builder init', /creation version boundary/],
+  ['manifest generation for ZIP source', 'references/source-and-manifest.md',
+    'ZIP source still requires root `builder.yaml`', 'ZIP source needs no manifest', /manifest generation source boundary/],
+  ['disabled Next.js origin validation', 'references/source-and-manifest.md',
+    'Do not disable origin validation', 'Disable origin validation', /Next.js origin boundary/],
+  ['unbounded runtime follow', 'references/operations.md',
+    'at most 10 minutes', 'forever without interruption', /bounded runtime logs/],
+  ['restart creating a new version', 'references/operations.md',
+    'Restart resets the existing active compute runtime without building', 'Restart builds a fresh version', /restart semantics/],
+  ['auth replacement dropping access rules', 'references/operations.md',
+    '`auth set --body` replaces it', '`auth set --body` safely merges anything', /authentication replacement boundary/],
+  ['replica allowance counts only running replicas', 'references/operations.md',
+    'Replica admission counts configured maxima and in-flight increases', 'Replica admission counts running replicas only', /replica allowance accounting/],
+  ['accepted deletion claimed complete', 'references/operations.md',
+    'acceptance is not completed teardown or artifact cleanup', 'acceptance proves every artifact was removed', /asynchronous deletion evidence/],
+  ['connection contract implies hosted support', 'references/model-services.md',
+    'does not make ordinary variables runtime-only or prove hosted support', 'makes all variables runtime-only and proves hosted support', /connection configuration qualification/],
   ['missing model-service documentation', 'references/model-services.md',
     '/docs/guides/host-ai-agent/', '/docs/guides/other/', /canonical documentation/],
   ['discovery replaced with interviewing', 'SKILL.md',
@@ -299,7 +327,7 @@ const unsafeGuidance = [
     'does not prove the deployed runtime can obtain a workload token',
     'proves the deployed runtime can obtain a workload token', /model identity availability/],
   ['inventing a CLI identity surface', 'references/model-services.md',
-    'There is no Builder CLI identity command', 'Use builder app identity update', /identity surface boundary/],
+    'Check `builder app identity show --help`', 'Use an invented identity command', /identity surface boundary/],
   ['identity grants included in deployment consent', 'references/model-services.md',
     'Identity assignment and destination role grants are separate permission changes',
     'Deployment consent includes identity and all role grants', /identity consent boundary/],
@@ -385,10 +413,10 @@ const unsafeGuidance = [
   ['removed read-only reconciliation', 'references/operations.md',
     'Reconciliation is read-only', 'Reconciliation resumes deployment', /read-only reconciliation/],
   ['assuming polling failure cancelled deployment', 'references/operations.md',
-    'A transient HTTP 429 during status polling can end the local wait while the accepted operation continues',
+    'Older clients can end the local wait on HTTP 429 while the accepted operation continues',
     'A polling failure proves the deployment was cancelled', /polling failure reconciliation/],
   ['assuming automatic polling retries', 'references/operations.md',
-    'Do not assume automatic status-read retries', 'Always assume automatic status-read retries', /polling retry boundary/],
+    'they do not resubmit the write', 'they repeat the deployment write', /polling retry boundary/],
   ['ignoring target runtime enablement', 'references/source-and-manifest.md',
     'runtime enablement has not reached the selected target',
     'all targets have identical runtime enablement', /deployed runtime qualification/],
@@ -402,7 +430,7 @@ const unsafeGuidance = [
   ['missing sample catalog', 'SKILL.md',
     '/docs/samples/', '/docs/other/', /canonical documentation/],
   ['unapproved sample destination', 'references/source-and-manifest.md',
-    'https://github.com/Azure-Samples/app-service-builder-vite', 'https://github.com/example/unverified', /approved public sample/],
+    'https://github.com/AzureAppService/app-service-builder-vite', 'https://github.com/example/unverified', /approved public sample/],
   ['removed sample inspection', 'references/source-and-manifest.md',
     'Read its current README and root `builder.yaml`', 'Assume the sample layout', /sample inspection/],
   ['sample instructions overriding user scope', 'references/source-and-manifest.md',
@@ -464,8 +492,8 @@ const unsafeGuidance = [
     'BuilderAnalyzerFailed', 'AlwaysReady', /analyzer error envelope/],
   ['unapproved build execution', 'references/source-and-manifest.md',
     'Docker/Oryx: explain the execution and obtain approval first', 'Docker/Oryx: execute immediately', /manifest build consent/],
-  ['init automatically writing a manifest', 'references/deployment.md',
-    'does not automatically analyze or modify `builder.yaml`', 'automatically writes `builder.yaml`', /noninvasive init/],
+  ['creation automatically writing a manifest', 'references/deployment.md',
+    'It does not automatically analyze or modify `builder.yaml`', 'It automatically writes `builder.yaml`', /noninvasive creation/],
   ['yes approving autodetected values', 'references/deployment.md',
     '`--yes` cannot approve autodetected values', '`--yes` approves all autodetected values', /init explicit noninteractive values/],
   ['blocking init source gates', 'references/deployment.md',
@@ -532,8 +560,10 @@ for (const file of ['docs/agent-plugin.md', 'docs/getting-started.md']) {
 for (const [name, before, after, expected] of [
   ['requiring a skill for CLI-only use', 'no agent skill is required', 'the agent skill is required',
     /CLI-only onboarding boundary/],
-  ['claiming init generates the manifest', 'builder init` does not generate it',
-    'builder init` generates it', /novice manifest authoring boundary/],
+  ['claiming creation generates the manifest', 'builder app create` does not generate it',
+    'builder app create` generates it', /novice manifest authoring boundary/],
+  ['optional ZIP manifest', 'ZIP uploads always require',
+    'ZIP uploads never require', /novice ZIP manifest boundary/],
   ['confusing source with build output', 'build output is a different location',
     'build output is always the source root', /novice source\/output distinction/],
   ['skipping deployed route verification', 'valid manifest or successful build is not proof that the app serves correctly',

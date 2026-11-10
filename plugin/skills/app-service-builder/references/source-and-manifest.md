@@ -12,7 +12,13 @@ Verify canonical repository identity (including numeric ID), connected branch, s
 
 Confirm intended changes are committed and pushed to the connected branch. Different local/remote SHAs alone do not establish ahead/behind: inspect ancestry against current remote evidence, distinguishing ahead, behind, and diverged histories. Distinguish a missing repository/ref from denied access (a not-found response can mask permissions) before suggesting a push. If access or ancestry is unknown, report that rather than overwriting remote work. Source publication needs its own authorization; local preview or plan approval is not permission to push.
 
-`builder.yaml` must exist at the source attachment root in the selected pushed revision. The attachment root and each component's `rootDirectory` differ: `rootDirectory` locates that component within the selected source. For example, attachment root `apps/store` and component root `web` select `apps/store/web`. Do not move the attachment root or reset the repository to a sample without agreement.
+Prefer a reviewed `builder.yaml` at the source attachment root in the selected pushed revision. The attachment root and each component's `rootDirectory` differ: `rootDirectory` locates that component within the selected source. For example, attachment root `apps/store` and component root `web` select `apps/store/web`. Do not move the attachment root or reset the repository to a sample without agreement.
+
+### Missing GitHub manifest
+
+Check the current [manifest-generation contract](https://builder.appservice.azure.com/docs/guides/builder-yaml/#if-you-dont-provide-builderyaml) and feature availability. Where available, deployment attempts best-effort generation for limited simple single-component GitHub app shapes when the selected revision has no root manifest. This is service-side deployment behavior, not a local CLI authoring command or permission to deploy. It does not replace an existing manifest or guarantee a successful build/startup. If published pages disagree about qualification, disclose that mismatch and prepare an explicit manifest instead.
+
+Inspect generated YAML in deployment logs, or **Settings → Auto-generated builder.yaml** for the active deployment. Review it against actual source, then obtain separate approval to save, commit, and publish an app-specific file. Extend the checked-in manifest as the app grows. Diagnose unsupported/ambiguous shapes and generation failures rather than repeatedly deploying unchanged source. **ZIP source still requires root `builder.yaml`; generation does not apply to uploads.** Local validation only checks an existing file.
 
 ### Local-directory/ZIP source
 
@@ -82,19 +88,28 @@ A successful build does not prove that the selected target can activate that run
 
 Current feature guidance covers one static component and one public HTTP component in the same app. Check the selected target rather than repeatedly asking the user to reconfirm this documented shape. When combining them, declare both public paths explicitly and account for the backend receiving its prefix. Do not equate this shape with Next.js standalone support. Keep model credentials and calls in the HTTP backend; see [model services](model-services.md) before adding an AI integration.
 
+## Next.js standalone
+
+Follow the [standalone contract](https://builder.appservice.azure.com/docs/reference/runtimes/#nextjs-standalone-requirements) and current [Next.js sample](https://github.com/AzureAppService/app-service-builder-nextjs). Demonstrated hosted behavior used Next.js 16.3.7 and Node.js 24 in West US 2; the sample now pins 16.4.4, which needs its own target verification. SSR, routing/client navigation, public/framework assets, image optimization, and JSON handlers are distinct checks.
+
+Keep `output: "standalone"` in Next.js configuration and the production standalone asset-preparation step, including assets needed inside the compute artifact. Use the adapter's Node.js compute/static contract, not `role: static`, generic SPA fallback, or a scalar static `output`. Default startup binds `HOSTNAME=0.0.0.0` and runs `node server.js` on port 3000; preserve binding, port, and an implemented health route when overriding it.
+
+**Hosted Server Actions remain unsupported.** Do not disable origin validation or allowlist a shared-domain wildcard. Working SSR does not qualify Server Actions, Edge Runtime, ISR/revalidation, streaming, other versions, or other regions.
+
 ## Optional sample-informed preparation
 
-Start with the user's existing framework/runtime and app shape. Use the [published sample catalog](https://builder.appservice.azure.com/docs/samples/) for discovery and context, not as proof that a particular deployment will succeed. The catalog links standalone Azure-Samples repositories. Follow the selected repository's current guidance rather than retired archive or local-sample paths. Do not claim a pending documentation update is already published.
+Start with the user's existing framework/runtime and app shape. Use the [published sample catalog](https://builder.appservice.azure.com/docs/samples/) for discovery and context, not as proof that a particular deployment will succeed. AzureAppService is the canonical home for framework starters and new integrations; existing service integrations without a counterpart remain in Azure-Samples. Follow the selected repository's current guidance rather than retired archive or local-sample paths. Do not claim a pending documentation update is already published.
 
-These are a few **verified public source examples**, not an exhaustive catalog or support matrix. Each is a standalone Azure-Samples repository with a root `builder.yaml`, not a subfolder of a platform repository:
+These are a few **public source examples**, not an exhaustive catalog or support matrix. Each is a standalone repository with a root `builder.yaml`, not a subfolder of a platform repository:
 
 | Existing app shape | Structural reference |
 | --- | --- |
-| Committed HTML/CSS/browser JavaScript | [Static HTML](https://github.com/Azure-Samples/app-service-builder-static-html): publish only `public/`; no hosted process or build |
-| TypeScript frontend built to browser assets | [Vite static](https://github.com/Azure-Samples/app-service-builder-vite): package/lock inputs and `dist` output; Node is a build toolchain |
-| Node HTTP | [Node.js](https://github.com/Azure-Samples/app-service-builder-nodejs): root package/lock files, `server.mjs`, listener and health route |
-| Python HTTP | [Python](https://github.com/Azure-Samples/app-service-builder-python): root dependency manifest, `app.py`, listener and health route |
-| .NET HTTP | [.NET](https://github.com/Azure-Samples/app-service-builder-dotnet): project/SDK inputs, published assembly startup, listener and health route |
+| Committed HTML/CSS/browser JavaScript | [Static HTML](https://github.com/AzureAppService/app-service-builder-static-html): publish only `public/`; no hosted process or build |
+| TypeScript frontend built to browser assets | [Vite static](https://github.com/AzureAppService/app-service-builder-vite): package/lock inputs and `dist` output; Node is a build toolchain |
+| Node HTTP | [Node.js](https://github.com/AzureAppService/app-service-builder-nodejs): root package/lock files, startup, listener and health route |
+| Python HTTP | [Python](https://github.com/AzureAppService/app-service-builder-python): dependency manifest, startup, listener and health route |
+| .NET HTTP | [.NET](https://github.com/AzureAppService/app-service-builder-dotnet): project/SDK inputs, published assembly startup, listener and health route |
+| PHP HTTP | [PHP](https://github.com/AzureAppService/app-service-builder-php): PHP 8.5 default nginx/PHP-FPM startup; omit `run.start`, retain a `run` block and an implemented `/health.php` |
 
 A static Vite sample is not a TypeScript web-runtime guarantee. Lack of a matching starter is not proof a runtime is unsupported. Select specialized HTTP MCP or model-backed assistant examples only when the user requests that workload; inspect their protocol, configuration, credentials, and external-service prerequisites separately. Such examples are ordinary app source, not Builder-managed agent services.
 
@@ -105,6 +120,6 @@ A static Vite sample is not a TypeScript web-runtime guarantee. Lack of a matchi
 3. Inspect configuration/secrets and external-service prerequisites. Publish only intended browser output; frontend build-time values may become public assets. Never copy credentials, assume external services are provisioned, or turn sample greeting/configuration examples into secret handling.
 4. Preserve repository identity and user work. Do not automatically fork, clone over, copy wholesale, change language, or reset to a sample. For existing code, adapt the existing repository; for a new app, the user may explicitly choose a starter/fork. Obtain approval for actual writes, dependency installs, source publication, and deployment within their distinct scopes.
 5. Disclose discrepancies between production docs and current sample README before relying on either for deployment. Some sample READMEs still link an older documentation host; use the canonical `https://builder.appservice.azure.com/docs/` for product guidance without making the user approve a link correction. Public source publication never overrides live availability warnings. Use the current runtime settings and actual target evidence rather than freezing an old catalog warning into a permanent runtime prohibition.
-6. Keep sample source in Azure-Samples, not vendored into the plugin or fetched by packaging tests/builds. Runtime inspection can read a selected public sample without executing it. Report what local preparation/checks actually ran; a prepared repository or successful local test is not a successful hosted deployment. Inspect actual activation and verify serving behavior separately.
+6. Keep sample source in its published repository, not vendored into the plugin or fetched by packaging tests/builds. Runtime inspection can read a selected public sample without executing it. Report what local preparation/checks actually ran; a prepared repository or successful local test is not a successful hosted deployment. Inspect actual activation and verify serving behavior separately.
 
 A starter is optional, not a prerequisite for existing code or supported runtime use. Before creating a requested fork, check for an existing usable owner fork and preserve its customizations; do not reset it to match a sample SHA. A fork request's acceptance is not readiness: verify actual repository identity, upstream relationship, and intended branch before using it. Reconcile an unknown outcome read-only before another create request. A working starter does not qualify every fork or source customization.
