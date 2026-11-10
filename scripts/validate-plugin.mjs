@@ -69,7 +69,7 @@ function checkGuidance(skillRoot) {
     ['references/deployment.md', /If app creation succeeds but source authorization fails[^]*missing connection/i, 'partial setup recovery'],
     ['references/operations.md', /All components receive them during build[^]*no runtime-only or per-component secret toggle/i, 'variable exposure boundary'],
     ['references/model-services.md', /Managed identity is documented[^]*?Portal identity blade[^.]*does not prove the deployed runtime can obtain a workload token/i, 'model identity availability'],
-    ['references/model-services.md', /There is no Builder CLI identity command/i, 'identity surface boundary'],
+    ['references/model-services.md', /Check `builder app identity show --help`[^]*older installed releases may lack them/i, 'identity surface boundary'],
     ['references/model-services.md', /Identity assignment and destination role grants are separate permission changes/i, 'identity consent boundary'],
     ['references/model-services.md', /Identity-only saves redeploy retained build output[^]*NoBuildArtifacts[^]*initial deployment/i, 'identity deployment boundary'],
     ['references/model-services.md', /principal ID[^]*destination data role[^]*client ID[^]*SDK selection/i, 'identity identifier distinction'],
@@ -124,8 +124,21 @@ function checkGuidance(skillRoot) {
     ['references/deployment.md', /observed branch SHA, requested commit, built version, activation attempt, active version\/deployment, and real HTTP\/health response/i, 'serving evidence'],
     ['references/deployment.md', /source change may trigger configured automation/i, 'source effects'],
     ['references/operations.md', /Reconciliation is read-only[^.]*must not implicitly resume writes/i, 'read-only reconciliation'],
-    ['references/operations.md', /A transient HTTP 429 during status polling can end the local wait while the accepted operation continues/i, 'polling failure reconciliation'],
-    ['references/operations.md', /Do not assume automatic status-read retries/i, 'polling retry boundary'],
+    ['references/operations.md', /Older clients can end the local wait on HTTP 429[^]*accepted operation continues/i, 'polling failure reconciliation'],
+    ['references/operations.md', /Current documented clients retry HTTP 429[^]*they do not resubmit the write/i, 'polling retry boundary'],
+    ['SKILL.md', /Target \*\*West US 2 \(`westus2`\) only\*\*/i, 'West US 2 target'],
+    ['references/prerequisites.md', /Target \*\*West US 2 \(`westus2`\) only\*\*[^]*not the resource group's metadata location/i, 'West US 2 discovery'],
+    ['references/deployment.md', /Native GitHub push deployment is supported as an explicit opt-in[^]*connecting source alone does not enable it/i, 'push deployment opt-in'],
+    ['references/deployment.md', /newer eligible waiting commits replace older waiting commits/i, 'push queue semantics'],
+    ['references/deployment.md', /Newer clients replace `builder init`[^]*Installed help determines/i, 'creation version boundary'],
+    ['references/source-and-manifest.md', /best-effort generation[^]*ZIP source still requires root `builder.yaml`/i, 'manifest generation source boundary'],
+    ['references/source-and-manifest.md', /Hosted Server Actions remain unsupported[^]*Do not disable origin validation/i, 'Next.js origin boundary'],
+    ['references/operations.md', /Follow requires one concrete active replica[^]*at most 10 minutes[^]*reconnecting may miss or repeat lines/i, 'bounded runtime logs'],
+    ['references/operations.md', /Restart resets the existing active compute runtime without building[^]*Static-only apps return `RestartNotSupported`/i, 'restart semantics'],
+    ['references/operations.md', /`auth set --body` replaces it[^]*`auth update --mode`[^]*preserving those settings/i, 'authentication replacement boundary'],
+    ['references/operations.md', /Replica admission counts configured maxima and in-flight increases/i, 'replica allowance accounting'],
+    ['references/operations.md', /acceptance is not completed teardown or artifact cleanup/i, 'asynchronous deletion evidence'],
+    ['references/model-services.md', /connection-owned settings are runtime-only[^]*does not make ordinary variables runtime-only or prove hosted support/i, 'connection configuration qualification'],
     ['references/operations.md', /static asset upload failed[^]*do not infer a whole-repository upload, file-count\/size limit, timeout, or port problem/i, 'static failure evidence boundary'],
     ['references/operations.md', /changed intent needs a new ID/i, 'retry intent'],
     ['references/operations.md', /Do not promise universal cancellation/i, 'cancellation uncertainty'],
@@ -145,8 +158,9 @@ function checkGuidance(skillRoot) {
     ['references/source-and-manifest.md', /Do not disable validation or suppress reported diagnostics/i, 'validator bypass protection'],
     ['references/source-and-manifest.md', /BuilderAnalyzerFailed[^]*exitCode:2[^]*actual exit code and prerequisite message/i, 'analyzer error envelope'],
     ['references/source-and-manifest.md', /Docker\/Oryx: explain the execution and obtain approval first[^]*Docker is NOT a security boundary/i, 'manifest build consent'],
-    ['references/deployment.md', /does not automatically analyze or modify `builder\.yaml`/i, 'noninvasive init'],
-    ['references/deployment.md', /^builder init\r?$/m, 'interactive init default'],
+    ['references/deployment.md', /It does not automatically analyze or modify `builder\.yaml`/i, 'noninvasive creation'],
+    ['references/deployment.md', /^builder app create\r?$/m, 'interactive creation default'],
+    ['references/deployment.md', /^builder init\r?$/m, 'legacy init compatibility'],
     ['references/deployment.md', /inside an initialized Git worktree/i, 'init Git worktree'],
     ['references/deployment.md', /GitHub sign-in does not select a local repository/i, 'source login directory boundary'],
     ['references/deployment.md', /Do not initialize Git in your home directory/i, 'home-directory protection'],
@@ -188,14 +202,15 @@ function checkGuidance(skillRoot) {
   }
   const examples = ['static-html', 'vite', 'nodejs', 'python', 'dotnet'];
   for (const example of examples) {
-    assert(source.includes(`](https://github.com/Azure-Samples/app-service-builder-${example})`),
+    assert(source.includes(`](https://github.com/AzureAppService/app-service-builder-${example})`),
       `Missing approved public sample destination: ${example}`);
   }
   for (const content of Object.values(contents)) {
+    assert(!/\beastus2\b|\bEast US 2\b/i.test(content), 'Unsupported customer region in maintained guidance');
     assert(!/https:\/\/builder\.appservice\.azure\.com\/docs\/downloads\/|(?:\.\.\/)?samples\/(?:static-html|nodejs-web|python-web|dotnet-web|vite-static)/i.test(content),
       'Retired sample distribution path');
     for (const [, command] of content.matchAll(/^builder app ([^\r\n]+)/gm)) {
-      if (/^(?:list|status)\b|--help\b/.test(command)) continue;
+      if (command === 'create' || /^(?:list|status)\b|--help\b/.test(command)) continue;
       assert(command.includes('--name "<app-name>"'), `App command requires --name: ${command}`);
     }
   }
@@ -397,8 +412,10 @@ export function validatePlugin(root = repositoryRoot) {
       `Missing docs-only agent onboarding: ${path}`);
   }
   const onboarding = readFileSync(resolve(root, 'docs/getting-started.md'), 'utf8');
-  assert(/builder init` does not generate it[^]*builder manifest validate` only checks/i.test(onboarding),
+  assert(/builder app create` does not generate it[^]*builder manifest validate` only checks/i.test(onboarding),
     'Missing novice manifest authoring boundary');
+  assert(/ZIP uploads always require[^]*root `builder.yaml`; generation does not apply to ZIP source/i.test(onboarding),
+    'Missing novice ZIP manifest boundary');
   assert(/source root[^]*build output is a different location[^]*\$DESTINATION_DIR/i.test(onboarding),
     'Missing novice source/output distinction');
   assert(/HTTP app[^]*startup[^]*declared port[^]*configured health route/i.test(onboarding),
