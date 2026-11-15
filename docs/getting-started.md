@@ -1,6 +1,6 @@
 # Getting started with App Service Builder
 
-> **Preview guide - updated November 10, 2026.**
+> **Preview guide - updated November 14, 2026.**
 > App Service Builder is open to everyone with an Azure subscription during preview,
 > subject to usage limits and regional availability. No invitation is required.
 
@@ -44,8 +44,9 @@ include secrets in screenshots, logs, or feedback.
 ### Deploy your first app in the portal (recommended)
 
 **No local CLI, Git, Node.js, or agent plugin is needed for this path.** You need
-an Azure subscription and a GitHub account for source
-access. If you prefer not to connect GitHub, use the
+an Azure subscription and, for GitHub source, an authorized GitHub account.
+If you prefer not to connect GitHub, use
+**Versions → Upload ZIP and deploy** for a prepared source ZIP, or the
 [CLI local-directory/ZIP path](https://builder.appservice.azure.com/docs/guides/deploy-zip-source/).
 
 1. In the [portal](https://builder.appservice.azure.com/), select your subscription
@@ -96,25 +97,16 @@ The documented preview allowances are:
 | Compute size | `small` |
 | Maximum replicas per app | 2 |
 | Maximum replicas across the subscription | 30 |
-| Concurrent builds per app | 1 |
-| Concurrent builds across the subscription | 2 |
-| Build-start allowance per app | Up to 10 starts; refills at 10 per hour |
-| Build-start allowance across the subscription | Up to 30 starts; refills at 30 per hour |
-| Build duration | 10 minutes, from admission through output publication |
-| Scale-increase allowance | Up to 10 per app and 30 across the subscription; refills at 10/app/hour and 30/subscription/hour |
-| Retained-version activation or redeploy without a new build | Up to 10 per app and 30 across the subscription; refills at 10/app/hour and 30/subscription/hour |
 
 Replica limits count the sum of configured maximum replicas across compute
-components, not just the number currently running. Build and operation
-allowances refill continuously rather than resetting at the top of each hour.
-Both the app and subscription allowances must have capacity. Scale increases and
-non-build activations have separate allowances; scale-down does not consume the
-scale-increase allowance. Failed or timed-out admitted builds still consume a
-build start.
+components and in-progress increases, not just the number currently running.
+New/changed scaling policies use minimum zero; the platform default is 0-1,
+with HTTP scaling and idle sleep enabled. There is no customer setting to keep
+an app permanently warm. Review existing positive minimums before changing them.
 
-These limits do not guarantee regional capacity. If an allowance is exhausted,
-wait for capacity to refill or an active build to finish, as applicable, and
-follow the retry guidance in the error.
+These limits do not guarantee regional capacity. Use the current limits guide
+and the actual service error, rather than obsolete fixed build-rate or timeout
+claims. Follow its retry guidance without silently changing or deleting resources.
 
 See [quotas and limits](https://builder.appservice.azure.com/docs/reference/limits/)
 for details. If you encounter a limit or need help understanding your allowance,
@@ -397,17 +389,26 @@ your project:
 | --- | --- |
 | Deploy your first app | Follow the [Portal quickstart](https://builder.appservice.azure.com/docs/quickstarts/portal/) or deploy [local-directory/ZIP source with Builder CLI](https://builder.appservice.azure.com/docs/guides/deploy-zip-source/). |
 | Iterate on your app | Deploy a code change, inspect [build and deployment logs](https://builder.appservice.azure.com/docs/guides/logging-and-monitoring/), and try deploying an eligible [retained version](https://builder.appservice.azure.com/docs/guides/deployments/). |
-| Deploy GitHub changes automatically | Opt into [automatic deployments](https://builder.appservice.azure.com/docs/guides/source-control/#automatic-deployment-policy) for your connected branch, then verify the deployed revision and app URL. |
-| Connect services or protect visitor access | Explore [managed identity](https://builder.appservice.azure.com/docs/guides/managed-identity/) and [visitor authentication](https://builder.appservice.azure.com/docs/guides/authentication/). |
+| Deploy GitHub changes automatically | New GitHub connections enable [automatic deployments](https://builder.appservice.azure.com/docs/guides/source-control/#automatic-deployment-policy) by default. Review the policy or opt out, then verify the deployed revision and app URL. |
+| Connect an existing service | Use **Overview/Architecture → Add connection** and the [Connections workflow](../plugin/skills/app-service-builder/references/model-services.md#explain-the-supported-path-first) first for supported profiles. |
+| Protect visitor access | Configure [visitor authentication](https://builder.appservice.azure.com/docs/guides/authentication/), separately from service identity. |
+| Control the deployed app | Use [Start/Stop](https://builder.appservice.azure.com/docs/guides/deployments/#stop-and-start-compute) and [Portal Log stream](https://builder.appservice.azure.com/docs/guides/logging-and-monitoring/) with the exact app and permissions. |
 
 Check [current feature availability](https://builder.appservice.azure.com/docs/resources/feature-status/)
-before choosing a workflow. Native GitHub push deployment is available as an
-opt-in; the Portal's separate **Use GitHub Actions** integration remains
+before choosing a workflow. GitHub source connections now default to automatic
+deployment; preserve the existing setting and disclose its effects before a push.
+The Portal's separate **Use GitHub Actions** integration remains
 **Coming soon**. Follow the published guide for each capability rather than
 assuming a CLI flag or saved setting proves availability.
 
-Managed identity still requires destination data permissions and network access;
-finish deploying the identity assignment before verifying runtime access.
+Connections is the recommended service-configuration experience for supported
+profiles. Managed-identity Blob Storage, Foundry inference and PostgreSQL delivery
+is qualified; expanded profiles, protected modes and CLI release qualification
+retain separate pending boundaries. Map names to the actual app SDK and use
+Connections rather than manual Variables for runtime-only settings. Saving a
+connection or selecting an identity neither grants access nor deploys/tests it.
+Complete the app-wide identity assignment, approve destination access, deploy
+the intended snapshot, and verify a real dependency operation.
 Visitor sign-in is separate from Azure management and GitHub source access.
 
 ## Feedback and support

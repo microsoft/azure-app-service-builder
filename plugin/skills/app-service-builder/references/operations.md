@@ -30,6 +30,8 @@ builder app deploymentlog "<deployment-id>" --name "<app-name>" --subscription "
 
 Version and deployment IDs must come from actual history. Use build logs to diagnose build failure and deployment logs to diagnose activation failure. `version build-log` can select `--component "<component>"` when needed. These history commands are not runtime logs or live HTTP metrics; use the separate runtime-log workflow below.
 
+Portal **Versions** now includes production status, deployment history and component build logs in version details; do not require a separate Deployments menu to exist. Lists are newest first. Check installed help for version `--status`/`--page` and deployment `--status`/`--app-version` filters; deployment lists can collect all matching pages automatically while retaining array JSON. Filtered or partially loaded history is not proof an operation/version is absent.
+
 ### Read active runtime logs
 
 Check `builder app replica list --help` and `builder app logs --help`. Read IDs from the active app, not old deployment history:
@@ -40,7 +42,9 @@ builder app logs --name "<app-name>" --subscription "<subscription-id>" --resour
 builder app logs --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --replica "<replica-id>" --follow
 ```
 
-Snapshot tails accept 1-300 lines; inspect truncation (`truncated` in JSON). `--replica all` is a deliberate multi-replica snapshot, not a follow selector. Follow requires one concrete active replica, does not support `--json`, and lasts at most 10 minutes, possibly less after idle. There is no continuation cursor: reconnecting may miss or repeat lines. IDs can change after restarts/scaling; a missing replica is not permission to silently select another. These logs read active stdout/stderr, not a failed candidate, request metrics, or Portal streaming. Keep sensitive output out of chat/public feedback and stop a stream when its bounded investigation ends.
+Snapshot tails accept 1-300 lines; inspect truncation (`truncated` in JSON). `--replica all` is a deliberate multi-replica snapshot, not a follow selector. Follow requires one concrete active replica, does not support `--json`, and lasts at most 10 minutes, possibly less after idle. There is no continuation cursor: reconnecting may miss or repeat lines. IDs can change after process recycling/scaling; a missing replica is not permission to silently select another. These logs read active stdout/stderr, not a failed candidate or request metrics. Keep sensitive output out of chat/public feedback and stop a stream when its bounded investigation ends.
+
+Portal **Log stream** follows stdout/stderr from up to 5 instances and requires app-scoped `Microsoft.Web/builderApps/runtimeLogs/read`. Reconnects can miss or repeat lines; timestamps are UTC and inferred levels are best-effort. A stopped/sleeping app has no instances to stream; reading logs is not approval to start it. This is not retained search or HTTP metrics. Exact-value redaction in build/startup diagnostics is not a secret-safety guarantee: transformed values can evade it. Never intentionally print secrets or dump the runtime environment.
 
 For application stdout/stderr export, consult the separate [runtime-log export guide](https://builder.appservice.azure.com/docs/guides/runtime-logs-log-analytics/) and current target availability. This is an ARM configuration workflow using a customer-owned destination and the app's managed identity, not a live Portal log viewer or automatic destination provisioning. Destination setup, identity/ingestion permissions, and export configuration require their own scoped authorization; a saved setting is not proof that new log records reached the workspace.
 
@@ -60,25 +64,28 @@ Read the current policy before changes. `auth set --body` replaces it; review th
 
 Read [scaling](https://builder.appservice.azure.com/docs/guides/scaling/) and [limits](https://builder.appservice.azure.com/docs/reference/limits/). Discover the actual compute component and saved policy; check `builder app scale show --help` and `builder app scale update --help` before use.
 
-Positive minimums keep warm replicas and need CPU/memory targets or HTTP scaling. Minimum zero opts eligible image-backed apps into scale to zero and requires HTTP scaling. Explain cold starts and request-interruption risks before changing policy; do not enable sleeping for an unsuitable workload. Obtain approval for the exact component, min/max, and targets. Saved policy and a replica snapshot do not establish continuous availability or live utilization metrics.
+Without saved component settings, the default is **0-1 replicas**. New/changed policies require minimum **0**, HTTP scaling is always enabled, and optional CPU/memory targets add signals. Legacy positive minimums remain effective/read-only until the next save changes them to zero. There is no supported customer setting to disable idle sleep or guarantee always-warm/background execution. `--disable` removes saved policy and restores 0-1, not sleeping-off.
 
-Documented customer allowances are 15 apps/subscription, `small` compute only, 2 maximum replicas/app and 30/subscription, 1 concurrent build/app and 2/subscription, and a 10-minute build duration. Build starts, scale increases, and non-build activations have separate rolling allowances of 10/app and 30/subscription per hour. Replica admission counts configured maxima and in-flight increases, not just running replicas. Effective limits can differ by rollout; an allowance does not reserve regional capacity.
+Explain five-to-six-minute idle sleep, cold starts, and request-interruption risks before a scaling change. Background work, SSE and WebSockets do not prevent sleep; retried writes can repeat effects. Eligible image-backed versions are required. Obtain approval for the exact component, maximum and targets, especially converting an existing warm policy. Saved policy and a replica snapshot do not establish continuous availability or live utilization metrics.
 
-Inspect `error.serviceLimit` when present, including code, scope, `allowedSizes`, `retryAt`, `requiredAction`, and `retryCondition`. Configuration/replica limits can return 409, concurrency/rate limits 429, build timeouts 408, and unavailable checks 503. A deployment can be accepted before its build fails a limit check: reconcile the operation first. Wait for the indicated refill/slot or request an allowance through documented support; do not delete apps, scale down another workload, or change compute size without approval. Failed/timed-out builds still consume starts. After a definitive allowance failure, an approved new attempt uses a new request ID after the stated delay; replaying the old ID does not admit a fresh build.
+Documented customer allowances are 15 apps/subscription, `small` compute only, 2 maximum replicas/app and 30/subscription. Replica admission counts configured maxima and in-flight increases, not just running replicas. Effective limits can differ by rollout; an allowance does not reserve regional capacity. Do not retain obsolete fixed build-rate/concurrency/time limits that current docs no longer promise.
 
-Where the updated subscription-state policy is deployed, `SubscriptionStateDoesNotAllowOperation` denies new mutations for `Warned`/`Suspended` subscriptions, including automatic triggers. Do not retry around it or promise denied work will replay. Authorized reads/deletion and already accepted work have separate semantics; do not infer running apps stopped. Check current feature status for rollout qualification and report the actual error.
+Inspect `error.serviceLimit` when present, including code, scope, `allowedSizes`, `requiredAction`, and `retryCondition`. Configuration/replica limits return 409 and unavailable checks 503; honor supplied retry timing. Reconcile any accepted operation before retrying. Request a documented allowance increase or review the intended policy; do not delete apps, scale down another workload, or change compute size without approval. A `Deleting` app can stop consuming app-count quota before cleanup completes, but its name stays unavailable and replica release follows separate rules.
 
-## Restart versus redeploy
+Where the updated subscription lifecycle is deployed, `Warned`/`Suspended` deny new mutations and stop compute while preserving configuration; `Deleted` additionally admits irreversible owned-resource cleanup. Returning to `Registered` clears restrictions after outstanding work settles, not by replaying denied triggers or resurrecting deleted apps. It does not automatically redeploy/restart compute, although ordinary wake and authorized operations can resume. `SubscriptionStateDoesNotAllowOperation` is not permission to retry around restrictions. Check current feature status for rollout qualification; customer-owned dependencies remain separate.
 
-Check current [deployment guidance](https://builder.appservice.azure.com/docs/guides/deployments/) and `builder app restart --help` before offering restart; newer source implementation does not prove a published CLI or target supports it. If unavailable, report the gap rather than silently deploying instead.
+## Start and stop versus redeploy
 
-Restart resets the existing active compute runtime without building, creating a version, or activating a replacement deployment. Redeploy activates retained artifacts in a replacement runtime; deploy resolves source/selects or builds a version. Choose the operation matching the problem and obtain separate approval for its disruption and target:
+**Restart has been removed.** Use current [Start/Stop guidance](https://builder.appservice.azure.com/docs/guides/deployments/#stop-and-start-compute) and installed `builder app start --help` / `stop --help`. Do not translate a restart request into two unapproved mutations or silently redeploy. Explain the requested interruption and obtain approval for the exact action/target:
 
 ```shell
-builder app restart --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>"
+builder app stop --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>"
+builder app start --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>"
 ```
 
-Static-only apps return `RestartNotSupported`; a mixed app can restart its compute runtime. Retain the request ID and actual operation URL, follow that operation, and verify the configured health route and real app behavior. Restart should preserve active version/deployment/runtime IDs; do not claim new source or changed variables were applied.
+Stop preserves deployed content, active IDs and scaling policy while all public requests, including static content, return HTTP 403. Traffic does not wake a stopped app. Start restores the deployed version without rebuilding; process memory/local files are not preserved. Static-only apps can use these actions to block/restore routes. Deploy/redeploy is rejected with `AppStopped` while stopped; starting is a separate approval, not a retry bypass. Automatic pushes while stopped and queued pushes across Stop/Start are dropped, not replayed.
+
+Follow the returned operation with its request ID; accepted start/stop is not completion. Verify both the intended route state and real app behavior without claiming new code or variables applied. Portal Start/Stop controls and CLI capabilities can roll out independently; check the actual surface, not an assumed toolbar. Redeploy is a separate retained-artifact activation, not Start.
 
 ## Manage desired variables
 
@@ -93,6 +100,10 @@ builder app version-config variables list --name "<app-name>" --subscription "<s
 Reads show names, not values. Do not claim that a name-only response verifies a saved value. Treat supplied values and settings files as sensitive; keep them out of chat, source control, shell history, and public feedback.
 
 Variables are not a managed secret store. All components receive them during build, and HTTP components also receive them at runtime; there is no runtime-only or per-component secret toggle. Authorized value retrieval can return all desired values. Do not describe name-only ordinary reads as encryption, non-retrievability, or protection from build scripts. `secretValue` and automatic `keyVaultReference` resolution are unsupported. App-owned Key Vault SDK access can use a configured [managed identity](model-services.md#configure-and-verify-workload-identity) with approved destination access; it does not resolve variable references automatically. For model keys, explain these boundaries and the [development/test credential workflow](model-services.md#configure-without-exposing-credentials) before accepting a configuration change.
+
+Use [Connections first](model-services.md#explain-the-supported-path-first) for supported service profiles. The app-wide Variables editor controls manual values only and preserves connection-owned settings, credentials and generated identity outputs. Those runtime-only mappings belong in Connections. Names are case-sensitive: `FOO` and `foo` coexist, but exact-name collisions across all runtime sources fail; omission preserves only an exact existing name. Reserved names include `PORT` and the `EMBR_` prefix ignoring case.
+
+Current storage encrypts variable values before persistence, including version/deployment snapshots, in addition to storage encryption at rest. That does not remove build exposure for manual values or authorized runtime access. Ordinary reads are names/status only; explicit selected current-value reveal requires delegated app-scoped `listVariables/action`, and Builder CLI has no reveal command. Do not reveal as part of discovery or treat a current value as an historical snapshot. Generic variable writes cannot supply protected connection secrets; use the qualified Connections entry flow instead.
 
 For a requested update, explain the affected names and obtain approval before writing. Use an approved local JSON file containing an object of variable names to string values:
 
@@ -120,7 +131,7 @@ builder app status "<operation-url>" --subscription "<subscription-id>" --json
 
 Use the returned URL only if known and trusted; if none was received, reconcile through app/history reads. Reconciliation is read-only: it must not implicitly resume writes, rollback/delete, or create duplicate apps, forks, or deployments. Preserve successful provisioning or source connection when a later step fails. An uncertain result is not evidence that all steps failed.
 
-Only after reconciliation and within the approved action, retry identical CLI deployment or supported restart intent with the same `--request-id <id>`. A changed intent needs a new ID, not reuse of the old one. A new attempt after a definitive allowance rejection follows the limit-specific recovery above, not uncertain-write replay. Respect pending-operation conflicts rather than replacing the active version. Do not promise universal cancellation or assume interrupting a local wait stops the server.
+Only after reconciliation and within the approved action, retry identical CLI deployment or Start/Stop intent with the same `--request-id <id>`. A changed intent needs a new ID, not reuse of the old one. A new attempt after a definitive allowance rejection follows the limit-specific recovery above, not uncertain-write replay. Respect pending-operation conflicts rather than replacing the active version. Do not promise universal cancellation or assume interrupting a local wait stops the server.
 
 ## Recover an eligible retained version
 
@@ -130,7 +141,9 @@ Inspect the actual intended retained version and establish that it is ready and 
 builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --version "<version-id>"
 ```
 
-Alternatively, use `--previous` only after inspecting which retained target it will activate and getting approval. Do not combine selectors. Retained-version activation does not rebuild local changes or overwrite retained versions. Do not require fresh source authorization merely to activate retained content.
+Alternatively, use `--previous` only after inspecting which retained target it will activate and getting approval. Do not combine selectors. Reusing retained outputs does not rebuild local changes or overwrite retained versions and needs no fresh source authorization.
+
+If retained outputs are missing, current clients can rebuild a GitHub version's pinned source and saved configuration into a **new version**, requiring original-source access. Rebuilding can change unpinned dependencies/tools and is not byte-identical rollback; review and authorize that build rather than silently treating it as artifact reuse. Missing uploaded-source outputs return `AppVersionSourceUploadRequired` and need a separately approved new ZIP. Read back the actual target version ID; no-wait or incomplete readback can leave it unknown. Retained settings/credentials stay historical, while authentication and app-wide identities are not restored.
 
 After activation, follow [deployment verification](deployment.md). A completed operation alone is not evidence that the recovered app serves HTTP.
 
@@ -147,3 +160,5 @@ builder app delete --name "<app-name>" --subscription "<subscription-id>" --reso
 Do not bypass confirmation with `--yes` or `-y` in normal examples, automatically delete the resource group, or remove separately owned resources/data as a follow-on action.
 
 Updated targets/clients can return asynchronous deletion progress. Retain the returned operation URL and honor `Retry-After`; acceptance is not completed teardown or artifact cleanup. Recover through that operation or the app's saved deletion state, not another deployment/create. A deleting app can reject writes with `BuilderAppDeletionInProgress`. Do not reuse its name until deletion completes or assume a missing runtime proves all artifacts were removed. Cleanup scope and hosted qualification vary by lifecycle/rollout; consult the current [deletion contract](https://builder.appservice.azure.com/docs/reference/arm-api/#deletion-operation), preserve receipts, and never apply an old operation to a recreated app.
+
+Supported CLI deletion waits can last 90 minutes by default; check `--wait-timeout`/`--no-wait` in installed help. `DeletionWaitTimeout`, `completed: false`, or a stopped local wait does not cancel cleanup. Follow the saved operation instead of issuing a fresh DELETE that could target a recreated app.

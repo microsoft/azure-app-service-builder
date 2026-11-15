@@ -11,7 +11,7 @@ Consult maintained [deployments and versions](https://builder.appservice.azure.c
 | GitHub pushed source | Use help-verified `builder app create` guided setup; verify GitHub user authorization and GitHub App access to the exact repository |
 | Local directory or ZIP | Use CLI 0.0.2 or compatible later help; create or reuse an app without connecting GitHub, then explicitly upload source |
 
-Do not make a CLI-only user install an agent skill, and do not make a ZIP-only user authorize GitHub. Both paths need Azure management access and separate approval for creation and deployment. ZIP source requires a valid root `builder.yaml` and is built by Builder, not uploaded as ready-to-run output. GitHub source can use the limited [manifest-generation workflow](source-and-manifest.md#missing-github-manifest) where documented and available. Portal ZIP deployment is not available. Target West US 2 (`westus2`) only.
+Do not make a CLI-only user install an agent skill, and do not make a ZIP-only user authorize GitHub. Both paths need Azure management access and separate approval for creation and deployment. The supported ZIP path requires a valid root `builder.yaml` and is built by Builder, not uploaded as ready-to-run output. GitHub source can use the limited [manifest-generation workflow](source-and-manifest.md#missing-github-manifest). Portal **Versions → Upload ZIP and deploy** is now available for prepared ZIP source. Target West US 2 (`westus2`) only.
 
 ## Create and connect GitHub source interactively
 
@@ -24,6 +24,8 @@ builder app create
 ```
 
 Creation does not upload uncommitted changes or start deployment. It does not automatically analyze or modify `builder.yaml`. Explicit creation can work outside a Git worktree; source defaults need the app checkout, not a repository initialized in the home directory. Read current help for explicit `--repository`, `--repository-id`, `--branch`, and `--root-directory` options; `--json` and `--yes` are not permission to guess missing values. Creation and source authorization can partially succeed: retain the app and recover only the missing stage.
+
+New GitHub source connections enable automatic deployment by default. Disclose this before source connection and pushing changes; source updates preserve the existing saved policy unless explicitly changed. If the user wants manual deployment, review and use `--auto-deploy-enabled false` on supported creation help, or the separate app policy control. Do not assume an older client's default or silently disable a user's existing automation.
 
 ### Older CLI setup compatibility
 
@@ -119,15 +121,19 @@ Alternatively, upload an existing ZIP unchanged:
 builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --source-archive "<source-zip-path>" --manifest "<matching-builder-yaml-path>" --json
 ```
 
-The ZIP must contain root `builder.yaml`, not a parent-folder wrapper. The separate planning manifest must match it byte for byte, including line endings and any BOM. Recreate the ZIP after manifest changes. The compressed limit is **100 MiB** and the UTF-8 manifest limit is **1 MiB**. Directory packaging supports at most 65,535 files, each smaller than 4 GiB; use a reviewed externally created ZIP64 archive for larger input within the compressed limit. POSIX packaging preserves ordinary executable bits; Windows packaging does not, so use a POSIX-created archive when executable permissions matter.
+The supported workflow must contain root `builder.yaml`, not a parent-folder wrapper. The separate planning manifest must match it byte for byte, including line endings and any BOM. Recreate the ZIP after manifest changes. The compressed limit is **100 MiB** and the UTF-8 manifest limit is **1 MiB**. Directory packaging supports at most 65,535 files, each smaller than 4 GiB; use a reviewed externally created ZIP64 archive for larger input within the compressed limit. POSIX packaging preserves ordinary executable bits; Windows packaging does not, so use a POSIX-created archive when executable permissions matter.
+
+Newer source contracts make `--manifest` optional and resolve the embedded root manifest, or attempt generation only when absent. **ZIP-only requests and automatic ZIP manifest generation still require target/client qualification.** Keep the prepared-manifest examples above until that boundary changes; an invalid existing manifest fails instead of triggering generation. If an older target requires `manifestYaml`, do not repeatedly repackage the same bytes or pretend newer help qualifies its backend.
+
+For Portal ZIP upload, review the exact archive and target in **Versions → Upload ZIP and deploy**. Save desired Connections before uploading; missing/unreadable declared credential status blocks submission. Portal upload is separate from GitHub source, and an unknown upload/deploy receipt needs read-only recovery, not another upload.
 
 Do not combine either upload selector with `--commit`, `--rebuild`, `--version`, `--previous`, or the other upload selector. Uploading source does not replace or remove an existing durable GitHub connection. To deploy later local changes, supply the upload selector again; omitting it selects configured GitHub source, not the last local directory. Retained-version activation is a separate inspected action.
 
-Keep the actual `requestId`, archive digest, returned operation URL, and version/deployment IDs for recovery. An accepted upload is not a build or deployment success. `SourceUploadDisabled` means the target does not support upload; stop that workflow rather than changing access or silently switching source. Invalid archives and manifest mismatches require corrected packaging, not repeated identical deployments. If observation is interrupted, reconcile the existing operation and app history read-only before retrying the same intent with the same request ID. Changed source/archive bytes are new intent and need a new ID.
+Keep the actual `requestId`, archive digest, returned operation URL, and version/deployment IDs for recovery. In newer CLI contracts, the deployment request ID stays stable while the upload-session key is derived from app, request ID, and archive digest; do not assume those keys are identical across releases. An accepted upload is not a build or deployment success. `SourceUploadDisabled` means the target does not support upload; stop that workflow rather than changing access or silently switching source. Invalid archives and manifest mismatches require corrected packaging, not repeated identical deployments. If observation is interrupted, reconcile the existing operation and app history read-only before retrying the same intent with the same request ID. Changed source/archive bytes are new intent and need a new ID.
 
 ## Automation and CI/CD requests
 
-Native GitHub push deployment is supported as an explicit opt-in for the connected branch; connecting source alone does not enable it. Inspect the saved policy and get approval for the exact app/branch before enabling it. An in-progress deployment continues; newer eligible waiting commits replace older waiting commits. A successful push or saved policy is not proof of deployment or serving.
+Native GitHub push deployment is enabled by default for new GitHub source connections; older availability summaries can still call it opt-in. Use current source-control/CLI guidance and inspect the saved policy rather than guessing. Connection/publication approval must disclose automatic build/deployment effects; policy changes need approval for the exact app/branch. An in-progress deployment continues; newer eligible waiting commits replace older waiting commits. A successful push or saved policy is not proof of deployment or serving.
 
 Use **Settings → Deployment Settings → Automatic deployments**, or check `builder app update --help` for `--auto-deploy-enabled` before an approved CLI change:
 
@@ -135,11 +141,13 @@ Use **Settings → Deployment Settings → Automatic deployments**, or check `bu
 builder app update --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --auto-deploy-enabled true --json
 ```
 
-Changing the policy is a cloud write; pushing to that branch can now trigger build/deployment. Disclose those effects, preserve source/branch selection, and verify actual deployment history. Disable only with separate authorization using the documented policy control.
+Changing the policy is a cloud write; pushing to that branch can trigger build/deployment. Disclose those effects, preserve source/branch selection, and verify actual deployment history. To opt out of the new default, use the approved policy control with `--auto-deploy-enabled false`; do not interpret omitted configuration as disabled.
 
 Native push deployment and an explicit deployment invoked by a customer-owned workflow are different mechanisms. The Portal's **Use GitHub Actions** integration remains **Coming soon**. ZIP flags alone do not establish unattended CI authentication. Before proposing GitHub Actions YAML, locate the current published workflow and authentication guidance for the selected target. Use the CLI/ARM guides to verify source format, target, token audience, idempotency, and completion checks; do not invent a service-principal login option, secret transfer, or a workflow from internal-only instructions.
 
 If the published guidance does not establish the requested automation/authentication path, explain that specific documentation gap rather than claiming all CI/CD is unsupported or asking the user to reverse-engineer product source. Preserve existing workflows, branch protection, and repository rulesets; do not disable them to bypass source publication or deployment errors. Diagnose the reported GitHub permission/ruleset error separately from Builder source installation access.
+
+Branch and pull-request previews are separate from automatic deployment of the connected branch. Merged preview code/configuration is not a supported customer procedure without current published setup, access/credential boundaries, target rollout, and lifecycle qualification. Do not send production credentials or assume a preview inherits main's service connections, visitor policies, or permissions.
 
 ## Verify service behavior
 
@@ -150,6 +158,8 @@ builder app show --name "<app-name>" --subscription "<subscription-id>" --resour
 ```
 
 Distinguish the observed branch SHA, requested commit, built version, activation attempt, active version/deployment, and real HTTP/health response. A moving branch or newer failed attempt does not identify what currently serves.
+
+Connections saves, identity assignment, Start, and successful grants alone do not apply new source/settings. New deployments must capture the intended connection/credential snapshot and resolve selected app-wide identities; verify an actual dependency operation separately from HTTP liveness. A stopped app returns `AppStopped` on deploy/redeploy: get separate Start authorization rather than treating this as a retryable build failure.
 
 For ZIP versions, inspect `source.kind` / `source.provider: "uploadedArtifact"` and `source.revision`, which is the archive SHA-256, not a Git commit. Compare the actual uploaded digest and active version; do not require local/remote commit equality for this workflow.
 
