@@ -71,7 +71,7 @@ function checkGuidance(skillRoot) {
     ['references/model-services.md', /Managed identity is documented[^]*?Portal identity blade[^.]*does not prove the deployed runtime can obtain a workload token/i, 'model identity availability'],
     ['references/model-services.md', /Check `builder app identity show --help`[^]*older installed releases may lack them/i, 'identity surface boundary'],
     ['references/model-services.md', /Identity assignment and destination role grants are separate permission changes/i, 'identity consent boundary'],
-    ['references/model-services.md', /Identity-only saves redeploy retained build output[^]*NoBuildArtifacts[^]*initial deployment/i, 'identity deployment boundary'],
+    ['references/model-services.md', /identity-only PATCH saves assignments without deployment[^]*failure of the latter does not undo the assignment[^]*NoBuildArtifacts[^]*initial deployment/i, 'identity deployment boundary'],
     ['references/model-services.md', /principal ID[^]*destination data role[^]*client ID[^]*SDK selection/i, 'identity identifier distinction'],
     ['references/model-services.md', /Never assume attaching an identity automatically sets this variable/i, 'identity client selection'],
     ['references/model-services.md', /key-based provider needs an explicitly reviewed SDK\/code change/i, 'sample identity compatibility'],
@@ -128,17 +128,28 @@ function checkGuidance(skillRoot) {
     ['references/operations.md', /Current documented clients retry HTTP 429[^]*they do not resubmit the write/i, 'polling retry boundary'],
     ['SKILL.md', /Target \*\*West US 2 \(`westus2`\) only\*\*/i, 'West US 2 target'],
     ['references/prerequisites.md', /Target \*\*West US 2 \(`westus2`\) only\*\*[^]*not the resource group's metadata location/i, 'West US 2 discovery'],
-    ['references/deployment.md', /Native GitHub push deployment is supported as an explicit opt-in[^]*connecting source alone does not enable it/i, 'push deployment opt-in'],
+    ['references/deployment.md', /Native GitHub push deployment is enabled by default for new GitHub source connections[^]*approval must disclose automatic build\/deployment effects/i, 'push deployment default disclosure'],
     ['references/deployment.md', /newer eligible waiting commits replace older waiting commits/i, 'push queue semantics'],
     ['references/deployment.md', /Newer clients replace `builder init`[^]*Installed help determines/i, 'creation version boundary'],
     ['references/source-and-manifest.md', /best-effort generation[^]*ZIP source still requires root `builder.yaml`/i, 'manifest generation source boundary'],
     ['references/source-and-manifest.md', /Hosted Server Actions remain unsupported[^]*Do not disable origin validation/i, 'Next.js origin boundary'],
     ['references/operations.md', /Follow requires one concrete active replica[^]*at most 10 minutes[^]*reconnecting may miss or repeat lines/i, 'bounded runtime logs'],
-    ['references/operations.md', /Restart resets the existing active compute runtime without building[^]*Static-only apps return `RestartNotSupported`/i, 'restart semantics'],
+    ['references/operations.md', /Restart has been removed[^]*Traffic does not wake a stopped app[^]*Start restores the deployed version without rebuilding[^]*Static-only apps can use these actions/i, 'start stop semantics'],
     ['references/operations.md', /`auth set --body` replaces it[^]*`auth update --mode`[^]*preserving those settings/i, 'authentication replacement boundary'],
     ['references/operations.md', /Replica admission counts configured maxima and in-flight increases/i, 'replica allowance accounting'],
     ['references/operations.md', /acceptance is not completed teardown or artifact cleanup/i, 'asynchronous deletion evidence'],
-    ['references/model-services.md', /connection-owned settings are runtime-only[^]*does not make ordinary variables runtime-only or prove hosted support/i, 'connection configuration qualification'],
+    ['SKILL.md', /recommend Builder Connections first[^]*not manual Variables/i, 'Connections first routing'],
+    ['references/model-services.md', /Recommend Builder Connections first[^]*Catalog presence or successful direct-variable service tests do not qualify named delivery/i, 'connection configuration qualification'],
+    ['references/model-services.md', /Connections never attaches or removes identities/i, 'connection identity separation'],
+    ['references/model-services.md', /Never put API keys, passwords, protected connection strings, or tokens in connection JSON/i, 'connection credential privacy'],
+    ['references/model-services.md', /Connection-owned settings, protected values, and generated identity outputs reach server runtime only, never builds or static frontends/i, 'connection runtime exposure'],
+    ['references/model-services.md', /Missing or unreadable required credential status blocks submission/i, 'connection incomplete setup'],
+    ['references/model-services.md', /approve removal and save it \*\*without deploying\*\*[^]*Do not deploy an incomplete intermediate configuration/i, 'connection migration boundary'],
+    ['references/model-services.md', /each deployment resolves selected identities' current IDs, including retained activation/i, 'connection current identity resolution'],
+    ['references/model-services.md', /CLI connection surface is implemented but release qualification remains separate/i, 'connection CLI qualification'],
+    ['references/operations.md', /default is \*\*0-1 replicas\*\*[^]*New\/changed policies require minimum \*\*0\*\*[^]*no supported customer setting to disable idle sleep/i, 'sleeping scaling default'],
+    ['references/operations.md', /Portal \*\*Log stream\*\*[^]*up to 5 instances[^]*runtimeLogs\/read/i, 'Portal runtime logs'],
+    ['references/operations.md', /case-sensitive[^]*exact-name collisions across all runtime sources fail/i, 'variable case sensitivity'],
     ['references/operations.md', /static asset upload failed[^]*do not infer a whole-repository upload, file-count\/size limit, timeout, or port problem/i, 'static failure evidence boundary'],
     ['references/operations.md', /changed intent needs a new ID/i, 'retry intent'],
     ['references/operations.md', /Do not promise universal cancellation/i, 'cancellation uncertainty'],
@@ -207,6 +218,7 @@ function checkGuidance(skillRoot) {
   }
   for (const content of Object.values(contents)) {
     assert(!/\beastus2\b|\bEast US 2\b/i.test(content), 'Unsupported customer region in maintained guidance');
+    assert(!/^\s*builder app restart\b/m.test(content), 'Removed Builder restart command');
     assert(!/https:\/\/builder\.appservice\.azure\.com\/docs\/downloads\/|(?:\.\.\/)?samples\/(?:static-html|nodejs-web|python-web|dotnet-web|vite-static)/i.test(content),
       'Retired sample distribution path');
     for (const [, command] of content.matchAll(/^builder app ([^\r\n]+)/gm)) {

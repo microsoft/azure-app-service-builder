@@ -2,7 +2,7 @@
 
 The `builder` plugin provides the `app-service-builder` skill for GitHub Copilot CLI and Claude Code, for authorized **Preview development/test, not production** use.
 
-Version 0.1.5 targets **West US 2 only** and refreshes guidance for guided app creation, opt-in push deployments, bounded runtime logs, Next.js standalone limits, scaling/allowances, and help-gated identity, visitor authentication, and restart operations. It distinguishes GitHub manifest generation from ZIP requirements and named connection settings from ordinary build-visible variables. New source implementation does not prove a published CLI or hosted target supports it. The [existing-model connection workflow](skills/app-service-builder/references/model-services.md) retains separate identity/access approvals and deployed integration verification. These are guidance changes, not new platform features.
+Version 0.1.6 recommends **Builder Connections first** for supported service integrations, with runtime-only mappings, per-connection identity selection, scoped grants, safe credential handling and sample migration. It separates qualified Blob/Foundry/PostgreSQL managed-identity delivery from pending expanded profiles, protected modes and CLI release qualification. The [Connections workflow](skills/app-service-builder/references/model-services.md) preserves app-wide identities, historical snapshots and separate deployment/access verification. Guidance also replaces removed Restart with Start/Stop, updates automatic GitHub deployment defaults, sleeping 0-1 scaling, Portal ZIP/log streaming, current runtime versions, encrypted variables and identity save/deploy separation. **West US 2 remains the only target.** These are guidance changes, not new platform features.
 
 ## Install
 

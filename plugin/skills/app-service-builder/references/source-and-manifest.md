@@ -77,7 +77,7 @@ Docker is NOT a security boundary for hostile repositories. Do not run build val
 
 For committed static browser assets, publish only the intended public directory, never a source tree containing secrets or server-only code. Pure static files may need no dependency installation, build, or process startup. Inspect the selected files and describe only checks actually performed; use CLI output rather than inventing a toolchain or manifest.
 
-Honor the user's selected runtime and actual project, not just the available starter. Recognized identifiers include Node, Python, .NET, and PHP; that does not establish support for every version, framework, or target. Inspect the exact runtime/version against current documentation rather than asking the user to certify it. A web app must serve HTTP on `0.0.0.0` at its declared port, normally `8080`. Inspect actual listener and app-owned health behavior; manifest validation does not implement them.
+Honor the user's selected runtime and actual project, not just the available starter. Recognized identifiers include Node, Python, .NET, and PHP; that does not establish support for every version, framework, or target. Inspect the exact runtime/version against current documentation rather than asking the user to certify it. Current runtime guidance lists Node.js 22/24/26, Python 3.13/3.14/3.15, .NET 10/11 and PHP 8.3/8.4/8.5; defaults can change, so preserve explicit reviewed pins instead of copying the latest default into an existing app. The hosted .NET version is separate from the local manifest analyzer's runtime requirement. A web app must serve HTTP on `0.0.0.0` at its declared port, normally `8080`. Inspect actual listener and app-owned health behavior; manifest validation does not implement them.
 
 
 A successful build does not prove that the selected target can activate that runtime. An unsupported-platform or version rejection can mean runtime enablement has not reached the selected target; preserve the exact error, inspect the app and deployment state, and explain the affected runtime/location. Check current runtime guidance for a documented alternative; ask before changing the target or runtime. Do not switch languages or replace the app to conceal the rejection. The Node.js prerequisite for running the CLI does not establish Node.js server-runtime availability.
@@ -87,6 +87,8 @@ A successful build does not prove that the selected target can activate that run
 ## Combined shape
 
 Current feature guidance covers one static component and one public HTTP component in the same app. Check the selected target rather than repeatedly asking the user to reconfirm this documented shape. When combining them, declare both public paths explicitly and account for the backend receiving its prefix. Do not equate this shape with Next.js standalone support. Keep model credentials and calls in the HTTP backend; see [model services](model-services.md) before adding an AI integration.
+
+Connection-owned settings and generated identity outputs are server-runtime-only and unavailable to frontend builds. App code must use their exact mappings and explicitly select the appropriate native SDK identity; catalog defaults do not adapt source code. Use the [Connections workflow](model-services.md#explain-the-supported-path-first) for supported integrations rather than moving service keys into browser build variables.
 
 ## Next.js standalone
 

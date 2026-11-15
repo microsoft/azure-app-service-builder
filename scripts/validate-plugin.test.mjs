@@ -27,7 +27,7 @@ function editJson(directory, path, edit) {
 
 test('valid package resolves the shared skill through both hosts', () => {
   assert.deepEqual(validatePlugin(), {
-    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.5', skills: 1,
+    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.6', skills: 1,
   });
 });
 
@@ -57,12 +57,20 @@ test('customer setup uses guided creation and scopes init to older CLI compatibi
   assert.match(deployment, /Do not initialize Git in your home directory/);
 });
 
+test('rejects runnable instructions for the removed restart command', (t) => {
+  const directory = fixture(t);
+  const file = resolve(directory, 'plugin/skills/app-service-builder/references/operations.md');
+  writeFileSync(file, readFileSync(file, 'utf8') +
+    '\n```shell\nbuilder app restart --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>"\n```\n');
+  assert.throws(() => validatePlugin(directory), /Removed Builder restart command/);
+});
+
 for (const [name, ending] of [['LF', '\n'], ['CRLF', '\r\n']]) {
   test(`accepts ${name} skill frontmatter`, (t) => {
     const directory = fixture(t);
     const file = resolve(directory, 'plugin/skills/app-service-builder/SKILL.md');
     writeFileSync(file, readFileSync(file, 'utf8').replaceAll('\r\n', '\n').replaceAll('\n', ending));
-    assert.equal(validatePlugin(directory).version, '0.1.5');
+    assert.equal(validatePlugin(directory).version, '0.1.6');
   });
 }
 
@@ -170,7 +178,7 @@ for (const suffix of ['.tgz', '.tgz.sha256']) {
     const path = resolve(directory, 'docs/agent-plugin.md');
     const url = `https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1-preview.1/azure-builder-cli-0.0.1${suffix}`;
     writeFileSync(path, readFileSync(path, 'utf8') + `\n[Approved release asset](${url})\n`);
-    assert.equal(validatePlugin(directory).version, '0.1.5');
+    assert.equal(validatePlugin(directory).version, '0.1.6');
   });
 }
 
@@ -263,8 +271,8 @@ const unsafeGuidance = [
     'Target **West US 2 (`westus2`) only**', 'Target any region', /West US 2 target/],
   ['wrong region discovery', 'references/prerequisites.md',
     'Target **West US 2 (`westus2`) only**', 'Choose any provider region', /West US 2 discovery/],
-  ['implicit automatic deployment', 'references/deployment.md',
-    'connecting source alone does not enable it', 'connecting source automatically enables it', /push deployment opt-in/],
+  ['hidden automatic deployment default', 'references/deployment.md',
+    'approval must disclose automatic build/deployment effects', 'approval need not mention deployment effects', /push deployment default disclosure/],
   ['deploying every waiting push', 'references/deployment.md',
     'newer eligible waiting commits replace older waiting commits', 'every waiting commit must deploy', /push queue semantics/],
   ['removed setup version check', 'references/deployment.md',
@@ -275,16 +283,52 @@ const unsafeGuidance = [
     'Do not disable origin validation', 'Disable origin validation', /Next.js origin boundary/],
   ['unbounded runtime follow', 'references/operations.md',
     'at most 10 minutes', 'forever without interruption', /bounded runtime logs/],
-  ['restart creating a new version', 'references/operations.md',
-    'Restart resets the existing active compute runtime without building', 'Restart builds a fresh version', /restart semantics/],
+  ['start building a new version', 'references/operations.md',
+    'Start restores the deployed version without rebuilding', 'Start builds a fresh version', /start stop semantics/],
   ['auth replacement dropping access rules', 'references/operations.md',
     '`auth set --body` replaces it', '`auth set --body` safely merges anything', /authentication replacement boundary/],
   ['replica allowance counts only running replicas', 'references/operations.md',
     'Replica admission counts configured maxima and in-flight increases', 'Replica admission counts running replicas only', /replica allowance accounting/],
   ['accepted deletion claimed complete', 'references/operations.md',
     'acceptance is not completed teardown or artifact cleanup', 'acceptance proves every artifact was removed', /asynchronous deletion evidence/],
-  ['connection contract implies hosted support', 'references/model-services.md',
-    'does not make ordinary variables runtime-only or prove hosted support', 'makes all variables runtime-only and proves hosted support', /connection configuration qualification/],
+  ['connection catalog implies hosted support', 'references/model-services.md',
+    'Catalog presence or successful direct-variable service tests do not qualify named delivery',
+    'Catalog presence qualifies every profile', /connection configuration qualification/],
+  ['manual Variables as recommended service path', 'SKILL.md',
+    'recommend Builder Connections first', 'recommend manual Variables first', /Connections first routing/],
+  ['connections attaching an identity implicitly', 'references/model-services.md',
+    'Connections never attaches or removes identities', 'Connections assigns identities automatically', /connection identity separation/],
+  ['connection credential copied into CLI', 'references/model-services.md',
+    'Never put API keys, passwords, protected connection strings, or tokens in connection JSON',
+    'Put secrets in connection JSON', /connection credential privacy/],
+  ['connection settings exposed during build', 'references/model-services.md',
+    'reach server runtime only, never builds or static frontends',
+    'reach every build and frontend', /connection runtime exposure/],
+  ['unknown credential status allowing deployment', 'references/model-services.md',
+    'Missing or unreadable required credential status blocks submission',
+    'Missing credential status allows deployment', /connection incomplete setup/],
+  ['deploying intermediate connection migration', 'references/model-services.md',
+    'Do not deploy an incomplete intermediate configuration',
+    'Deploy after each intermediate removal', /connection migration boundary/],
+  ['retained version restores identity GUIDs', 'references/model-services.md',
+    "each deployment resolves selected identities' current IDs, including retained activation",
+    'retained activation restores historical identity GUIDs', /connection current identity resolution/],
+  ['unpublished CLI promoted as qualified', 'references/model-services.md',
+    'CLI connection surface is implemented but release qualification remains separate',
+    'Every installed CLI supports qualified connection writes', /connection CLI qualification/],
+  ['identity save assumed to deploy', 'references/model-services.md',
+    'identity-only PATCH saves assignments without deployment',
+    'identity PATCH deploys automatically', /identity deployment boundary/],
+  ['identity deployment failure undoing saved assignment', 'references/model-services.md',
+    'failure of the latter does not undo the assignment',
+    'deployment failure undoes the assignment', /identity deployment boundary/],
+  ['changed scaling allows warm replicas', 'references/operations.md',
+    'New/changed policies require minimum **0**',
+    'New policies can keep any minimum', /sleeping scaling default/],
+  ['Portal stream assumed unlimited', 'references/operations.md',
+    'up to 5 instances', 'every instance forever', /Portal runtime logs/],
+  ['variable names compared ignoring case', 'references/operations.md',
+    'Names are case-sensitive', 'Names ignore case', /variable case sensitivity/],
   ['missing model-service documentation', 'references/model-services.md',
     '/docs/guides/host-ai-agent/', '/docs/guides/other/', /canonical documentation/],
   ['discovery replaced with interviewing', 'SKILL.md',

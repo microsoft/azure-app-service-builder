@@ -1,11 +1,11 @@
 ---
 name: app-service-builder
-description: "Use for explicit App Service Builder requests: discover setup context, prepare builder.yaml, choose GitHub or local ZIP source, recover source access, connect existing services, deploy, configure identity or visitor sign-in, scale, inspect runtime logs, restart, or recover a retained version. For Preview development/test in West US 2. Assume users have platform access. Not for ordinary Azure App Service, Azure Container Apps, or internal platform operations. A generic 'deploy my app' request must first select the product and target."
+description: "Use for explicit App Service Builder requests: prepare builder.yaml, choose GitHub or ZIP source, use Connections to connect existing Azure services, deploy, configure identity or visitor sign-in, scale, inspect logs, start/stop, or recover a retained version. For Preview development/test in West US 2. Assume users have platform access. Not for ordinary Azure App Service, Azure Container Apps, or internal platform operations. A generic 'deploy my app' request must first select the product and target."
 ---
 
 # App Service Builder
 
-Help customers use the `builder` CLI for **Preview development/test**, not production. Plugin installation does not install the CLI or grant Azure/GitHub permissions.
+Help customers use documented Portal, `builder` CLI, and ARM workflows for **Preview development/test**, not production. Plugin installation does not install the CLI or grant Azure/GitHub permissions.
 
 This public repository is the maintained customer skill home; the CLI supplies existing-manifest validation and app operations, not a second skill installation route. No private checkout is required.
 
@@ -29,11 +29,11 @@ Inspect before interviewing. Reuse facts the user already supplied and verified 
 
 Assume users already have platform access and are working with the environment and resources they were given. Use that context as the starting point; do not require enrollment proof, an eligibility questionnaire, or an out-of-band approval before helping them.
 
-Use plain task language: "Which region should I use?" or "This account cannot access the selected subscription." Do not ask for preview-approval attestations, describe the user's target as preview-approved, or send the user to a preview contact. Keep the development/test status as brief context, not a recurring disclaimer or setup gate. Check documented feature limits and actual service responses; lack of a separate eligibility confirmation is not a blocker. An actual authentication or permission failure still needs a concrete fix; assumed platform access is not permission to bypass it.
+Use plain task language: "Which existing resource should I connect?" or "This account cannot access the selected subscription." Do not ask for preview-approval attestations, describe the user's target as preview-approved, or send the user to a preview contact. Keep the development/test status as brief context, not a recurring disclaimer or setup gate. Check documented feature limits and actual service responses; lack of a separate eligibility confirmation is not a blocker. An actual authentication or permission failure still needs a concrete fix; assumed platform access is not permission to bypass it.
 
 Explain an actual blocker and its smallest recovery action, not the entire prerequisite checklist again. A skipped diagnostic is not a pass; missing optional local validation or Azure CLI is not by itself a deployment blocker. Do not add confirmation prompts for routine reads or ask again for an unchanged, already-authorized action; still obtain separate authorization for new effects, account changes, permissions, publication, and deployment as required by the host.
 
-For an AI-backed app, read the model-service workflow before collecting configuration or creating cloud resources. Prefer managed identity where the destination and application SDK support it; explain identity assignment, deployment, destination access, and variable-exposure boundaries up front. Discover existing compatible resources rather than sending the user to copy endpoints by hand.
+For service-backed apps, **recommend Builder Connections first**, not manual Variables, for supported profiles. Read the service-connection workflow before collecting configuration or creating resources. Prefer managed identity where the destination and application SDK support it; explain app-wide identity assignment, per-connection selection, runtime-only mappings, destination permissions, and separate deployment. Discover existing compatible resources rather than sending the user to copy endpoints by hand. Preserve existing integrations and use manual configuration only for an unsupported profile, an incompatible client, or an explicitly chosen fallback.
 
 ## Choose the focused workflow
 
@@ -41,10 +41,10 @@ For an AI-backed app, read the model-service workflow before collecting configur
 | --- | --- |
 | Check access, CLI readiness, and source authorization | [Prerequisites and readiness](references/prerequisites.md) |
 | Inspect app layout, use optional samples, and validate an existing builder.yaml | [Source and manifest](references/source-and-manifest.md) |
-| Call an existing Azure OpenAI/Foundry or other model service | [Model services and external dependencies](references/model-services.md) |
+| Connect an existing Azure service through Connections, or call a model service | [Connections, model services and external dependencies](references/model-services.md) |
 | Choose GitHub or local ZIP source, create/setup, deploy, and verify | [Deployment](references/deployment.md) |
 | Find an explicit automation path without assuming native push or CI login support | [Deployment automation](references/deployment.md#automation-and-cicd-requests) |
-| Inspect failures/history/runtime logs, scale, configure visitor sign-in, restart, recover, or delete | [Operations](references/operations.md) |
+| Inspect failures/history/runtime logs, scale, configure visitor sign-in, start/stop, recover, or delete | [Operations](references/operations.md) |
 
 Read the relevant reference in full. All command examples have descriptive placeholders: replace them only with user-confirmed or verified values; never execute angle-bracket values literally. Use `builder --help` and command-specific help to check the installed CLI before using options. Do not invent missing commands.
 
@@ -56,8 +56,9 @@ Use `builder manifest validate` to check an existing manifest. It does not creat
 
 - Work from the user's selected source; samples are optional. GitHub deployment uses pushed commits and requires separate user authorization and GitHub App repository access. Local-directory/ZIP deployment uploads selected source without GitHub consent; use app creation, not Git-backed `init`, for a new ZIP-only app. Provisioning, source connection, and deployment are separate effects. `init` is setup, not a local upload or explicit deploy; source changes may trigger configured automation where enabled. Preserve partial success and retry only the missing step.
 - Static browser assets and documented HTTP apps are the core focus. Runtime recognition is not proof of successful activation; current feature status takes precedence over bundled examples. Combined static/HTTP output and Next.js standalone have different contracts. Follow the source reference for Next.js's qualified scope; hosted Server Actions remain unsupported.
-- Native GitHub push deployment is opt-in, not an automatic consequence of connecting source. CLI runtime-log snapshots/streaming, scaling, identity, and visitor-authentication commands require installed-help checks and their focused references. A runtime log stream is not HTTP metrics or continuous monitoring. Saved identity alone does not prove deployed token acquisition or destination access.
-- Do not provide runnable instructions for unavailable custom domains, private networking, persistent mounts, shell access, Portal runtime-log streaming, or runtime/HTTP metrics. Builder-managed connector provisioning and trigger subscriptions remain separate from app-owned Connector Namespace integration. Named service-connection ARM configuration is not proof of hosted qualification or Portal/CLI setup support; check current documentation before proposing it.
+- New GitHub source connections enable automatic deployment by default; disclose that effect before connection/publication and offer an explicit opt-out. Preserve existing policy. Portal **Log stream** and CLI runtime logs are bounded diagnostics, not HTTP metrics or continuous monitoring. Start/Stop, scaling, identity, and visitor-authentication commands require installed-help checks and their focused references; Restart has been removed.
+- Do not provide runnable instructions for unavailable custom domains, private networking, persistent mounts, shared-preview shell/command execution, or runtime/HTTP metrics. Branch/PR previews, expanded connection profiles, and protected credentials need their own current availability checks. Builder Connections is distinct from Connector Namespace consent/provisioning and trigger subscriptions, which remain external.
+- Connections delivers mapped settings and selected-identity outputs only to server runtime, not builds or static frontends. Saving configuration, credentials, or grants is not deployment or proof of access. Match app SDKs and verify a bounded deployed dependency operation; prefer qualified Blob, Foundry inference, and PostgreSQL managed-identity paths without transferring qualification to other profiles or authentication modes.
 - For desired variables, follow the help-gated [variable workflow](references/operations.md#manage-desired-variables). Reads show names rather than values; updates need scoped approval and a separate build/deployment to take effect.
 - A request accepted by the service, successful build, or operation completion alone is not a serving app. Inspect returned app state and runtime URL, then verify real HTTP behavior and the app-owned health endpoint. Report any unverified stage plainly.
 - Do not change cloud access or install plugins globally as part of app work. Keep secrets and confidential diagnostics out of source, responses, and public feedback. For public feedback use sanitized examples; report vulnerabilities privately via the repository's security policy.
