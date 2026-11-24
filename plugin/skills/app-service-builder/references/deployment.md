@@ -9,7 +9,7 @@ Consult maintained [deployments and versions](https://builder.appservice.azure.c
 | Source | Setup and access |
 | --- | --- |
 | GitHub pushed source | Use help-verified `builder app create` guided setup; verify GitHub user authorization and GitHub App access to the exact repository |
-| Local directory or ZIP | Use CLI 0.0.2 or compatible later help; create or reuse an app without connecting GitHub, then explicitly upload source |
+| Local directory or ZIP | Use the current public release's help-verified upload selectors; create or reuse an app without connecting GitHub, then explicitly upload source |
 
 Do not make a CLI-only user install an agent skill, and do not make a ZIP-only user authorize GitHub. Both paths need Azure management access and separate approval for creation and deployment. The supported ZIP path requires a valid root `builder.yaml` and is built by Builder, not uploaded as ready-to-run output. GitHub source can use the limited [manifest-generation workflow](source-and-manifest.md#missing-github-manifest). Portal **Versions → Upload ZIP and deploy** is now available for prepared ZIP source. Target West US 2 (`westus2`) only.
 
@@ -67,6 +67,8 @@ Check the actual saved repository ID, branch, root, and automatic-deployment set
 
 Read `builder app deploy --help` and inspect the intended source/target before deployment:
 
+For `--commit`, verify that the exact revision exists and is accessible in the configured repository. Newer clients reject missing revisions before admission with `SourceRevisionNotFound`. A masked not-found/access error is not permission to push, change repositories, or fall back to branch HEAD.
+
 ```shell
 builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>"
 ```
@@ -107,13 +109,15 @@ builder app create --name "<app-name>" --subscription "<subscription-id>" --reso
 
 Reuse an existing app when that is the intended target. A ZIP-only app can remain `sourceIntegrationState: "NotConfigured"`; do not install the GitHub App or run Git-backed `init` to fix that expected state.
 
-Before uploading, review every included file and obtain approval for the exact source and cloud action. Directory packaging excludes `.git` but does not apply `.gitignore` or automatically exclude `.env`, credentials, dependency caches, or unrelated files. Use a reviewed clean staging directory when necessary; never delete or overwrite the user's originals. Packaging rejects symlinks and special files. Put `builder.yaml` at the selected source root:
+Before uploading, review every included file and obtain approval for the exact source and cloud action. Directory packaging excludes `.git`; older published clients do not honor ignore files, while newer packaging supports `.gitignore` and `.builderignore`. Inspect the installed release's actual packaging behavior; do not infer it from a source merge or assume secrets are excluded. Use a reviewed clean staging directory when necessary; never delete or overwrite the user's originals. Packaging rejects symlinks and special files. Put `builder.yaml` at the selected source root:
 
 ```shell
 builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --source "<reviewed-source-directory>" --json
 ```
 
 For a subdirectory, the optional `--root-directory` selects a safe directory within `--source`; it is valid only with directory input. The selected directory becomes the ZIP root. This does not change a durable GitHub source attachment root.
+
+In ignore-aware clients, Git-style rules load from the enclosing Git worktree root (or selected source outside Git) down. `.builderignore` follows `.gitignore` in the same folder, so `!pattern` can re-include a Git-ignored file, but not children of an excluded parent. Rules apply even to tracked files and match ignoring case. Global Git excludes and `.git/info/exclude` are not read; ignore files must be valid UTF-8. An explicitly selected ignored folder is still packaged with a warning, while rules continue inside it. The CLI reports up to 10 excluded entries on stderr. Excluding root `builder.yaml` stops deployment; review a precise `!builder.yaml` override rather than disabling all ignore rules. These filters do not scan for secrets and never apply to an existing ZIP uploaded unchanged.
 
 Alternatively, upload an existing ZIP unchanged:
 
@@ -127,7 +131,19 @@ Newer source contracts make `--manifest` optional and resolve the embedded root 
 
 For Portal ZIP upload, review the exact archive and target in **Versions → Upload ZIP and deploy**. Save desired Connections before uploading; missing/unreadable declared credential status blocks submission. Portal upload is separate from GitHub source, and an unknown upload/deploy receipt needs read-only recovery, not another upload.
 
-Do not combine either upload selector with `--commit`, `--rebuild`, `--version`, `--previous`, or the other upload selector. Uploading source does not replace or remove an existing durable GitHub connection. To deploy later local changes, supply the upload selector again; omitting it selects configured GitHub source, not the last local directory. Retained-version activation is a separate inspected action.
+Do not combine either upload selector with `--commit`, `--rebuild`, `--version`, `--previous`, or the other upload selector. Uploading source does not replace or remove an existing durable GitHub connection. To deploy later local code changes, supply the upload selector again; when GitHub is connected, omitting it selects configured GitHub source, not the last local directory. Retained-version activation is a separate inspected action.
+
+### Rebuild configuration using retained active ZIP source
+
+Newer service/client contracts keep the active version's uploaded ZIP for configuration changes. Check `builder app deploy --help` for `--active-source` and actual target support before offering it. This builds the active source again with **current desired configuration**, not the old `--version` snapshot, and cannot capture local source edits:
+
+```shell
+builder app deploy --name "<app-name>" --subscription "<subscription-id>" --resource-group "<resource-group>" --active-source
+```
+
+`--active-source` combines only with supported `--rebuild`, not upload/commit/version/previous selectors. It is essential to deliberately choose active ZIP source when a GitHub connection also exists; never silently switch to GitHub during an identity/variable/connection update. Where supported, Portal **Save and deploy** / **Deploy after saving** can reuse that ZIP. Verify source selection, approvals and operation receipts, not merely a saved configuration badge.
+
+The active ZIP is kept until another version becomes active, then for up to 72 hours. Earlier versions are not guaranteed to retain source; `AppVersionSourceUploadRequired` needs a separately approved new upload. ZIP retention is distinct from compiled build-output retention. If installed help lacks active-source support, use the known prepared-archive workflow, not a fabricated flag or forced source reconnection.
 
 Keep the actual `requestId`, archive digest, returned operation URL, and version/deployment IDs for recovery. In newer CLI contracts, the deployment request ID stays stable while the upload-session key is derived from app, request ID, and archive digest; do not assume those keys are identical across releases. An accepted upload is not a build or deployment success. `SourceUploadDisabled` means the target does not support upload; stop that workflow rather than changing access or silently switching source. Invalid archives and manifest mismatches require corrected packaging, not repeated identical deployments. If observation is interrupted, reconcile the existing operation and app history read-only before retrying the same intent with the same request ID. Changed source/archive bytes are new intent and need a new ID.
 

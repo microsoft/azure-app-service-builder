@@ -1,7 +1,7 @@
 {
   "name": "builder",
   "description": "Customer-facing App Service Builder guidance for authorized Preview development/test use.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": {
     "name": "Microsoft"
   },

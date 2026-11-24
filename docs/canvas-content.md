@@ -14,7 +14,7 @@ the corresponding section anchors. It does not require a runtime schema change.
 The guidance commit identifies the public source revision before this packaging
 adaptation. The historical 1.0.0 snapshot remains unchanged.
 
-The separately installed agent plugin is now 0.1.6; approved canvas content
+The separately installed agent plugin is now 0.1.7; approved canvas content
 1.0.1 still packages plugin 0.1.3. Updating the shared skill files does not
 update installed launcher adapters, saved journeys, or that approved pointer.
 The complete current guidance exceeds schema 1's 64 KiB guidance limit, and the
