@@ -27,7 +27,7 @@ function editJson(directory, path, edit) {
 
 test('valid package resolves the shared skill through both hosts', () => {
   assert.deepEqual(validatePlugin(), {
-    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.6', skills: 1,
+    marketplace: 'azure-app-service-builder', plugin: 'builder', version: '0.1.7', skills: 1,
   });
 });
 
@@ -70,7 +70,7 @@ for (const [name, ending] of [['LF', '\n'], ['CRLF', '\r\n']]) {
     const directory = fixture(t);
     const file = resolve(directory, 'plugin/skills/app-service-builder/SKILL.md');
     writeFileSync(file, readFileSync(file, 'utf8').replaceAll('\r\n', '\n').replaceAll('\n', ending));
-    assert.equal(validatePlugin(directory).version, '0.1.6');
+    assert.equal(validatePlugin(directory).version, '0.1.7');
   });
 }
 
@@ -178,7 +178,7 @@ for (const suffix of ['.tgz', '.tgz.sha256']) {
     const path = resolve(directory, 'docs/agent-plugin.md');
     const url = `https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1-preview.1/azure-builder-cli-0.0.1${suffix}`;
     writeFileSync(path, readFileSync(path, 'utf8') + `\n[Approved release asset](${url})\n`);
-    assert.equal(validatePlugin(directory).version, '0.1.6');
+    assert.equal(validatePlugin(directory).version, '0.1.7');
   });
 }
 
@@ -197,7 +197,7 @@ test('customer CLI installation uses the downloaded archive and checks the versi
   const install = readFileSync(resolve(root, 'docs/agent-plugin.md'), 'utf8')
     .split('## Package layout and local checks')[0];
   assert.equal(install.split('\n').find((line) => line.startsWith('Download the ')),
-    'Download the [CLI 0.0.2 preview archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.2-preview.1/azure-builder-cli-0.0.2.tgz).');
+    'Download the [CLI 0.0.1 archive](https://github.com/microsoft/azure-app-service-builder/releases/download/builder-cli-v0.0.1/azure-builder-cli-0.0.1.tgz).');
   assert.match(install, /npm install --global "<path-to-downloaded-file\.tgz>"\r?\nbuilder --version/);
 });
 
@@ -296,8 +296,17 @@ const unsafeGuidance = [
     'Catalog presence qualifies every profile', /connection configuration qualification/],
   ['manual Variables as recommended service path', 'SKILL.md',
     'recommend Builder Connections first', 'recommend manual Variables first', /Connections first routing/],
+  ['skipping the supported Connections list', 'SKILL.md',
+    'check the current supported Connections service list first',
+    'assume every service supports Connections', /Connections support-first fallback/],
+  ['blocking services absent from Connections', 'SKILL.md',
+    'If the service is not listed, proceed with its standard SDK/API connection method',
+    'If the service is not listed, stop all integration work', /Connections support-first fallback/],
+  ['catalog failure treated as service absence', 'references/model-services.md',
+    'failed catalog lookup is not proof of absence',
+    'failed catalog lookup proves the service is unsupported', /Connections catalog lookup boundary/],
   ['connections attaching an identity implicitly', 'references/model-services.md',
-    'Connections never attaches or removes identities', 'Connections assigns identities automatically', /connection identity separation/],
+    'connection save itself does not assign or remove identities', 'connection save assigns identities implicitly', /connection identity separation/],
   ['connection credential copied into CLI', 'references/model-services.md',
     'Never put API keys, passwords, protected connection strings, or tokens in connection JSON',
     'Put secrets in connection JSON', /connection credential privacy/],
@@ -314,8 +323,44 @@ const unsafeGuidance = [
     "each deployment resolves selected identities' current IDs, including retained activation",
     'retained activation restores historical identity GUIDs', /connection current identity resolution/],
   ['unpublished CLI promoted as qualified', 'references/model-services.md',
-    'CLI connection surface is implemented but release qualification remains separate',
+    'Installed help and current target support remain required',
     'Every installed CLI supports qualified connection writes', /connection CLI qualification/],
+  ['typed update overwriting omitted settings', 'references/model-services.md',
+    'update patches supplied typed fields while preserving omitted settings/mappings',
+    'update replaces all omitted settings', /typed connection patch preservation/],
+  ['ambiguous unattended resource selection', 'references/model-services.md',
+    'require a full ARM ID for unattended use',
+    'choose the first resource for unattended use', /connection automation scope/],
+  ['key acquisition treated as discovery', 'references/model-services.md',
+    'credential retrieval/transfer, not discovery',
+    'read-only discovery', /connection key acquisition boundary/],
+  ['typed connections claiming automatic grants', 'references/model-services.md',
+    'commands provide role/administrator instructions, not `--grant-access` or automatic permission grants',
+    'commands automatically grant Contributor', /typed connection grant boundary/],
+  ['masked UI assumed never to read plaintext', 'references/model-services.md',
+    'masked UI is not proof plaintext was never read',
+    'masked UI proves no plaintext is read', /masked value-read boundary/],
+  ['all expanded profiles assumed unavailable', 'references/model-services.md',
+    'eleven enabled configuration profiles',
+    'three enabled profiles only', /expanded catalog qualification/],
+  ['exec treated as harmless diagnostics', 'references/operations.md',
+    'obtain separate execution approval',
+    'execute without any approval', /privileged exec approval/],
+  ['exec accepts piped input', 'references/operations.md',
+    '`-i` without `-t` and piped stdin are unsupported',
+    'Piped input is supported everywhere', /exec terminal input boundary/],
+  ['disconnect cancels remote command', 'references/operations.md',
+    'Disconnect may not stop the remote process',
+    'Disconnect always kills the remote process', /exec uncertain outcome/],
+  ['active ZIP picks up unuploaded local edits', 'references/deployment.md',
+    'cannot capture local source edits',
+    'captures every unuploaded local edit', /active ZIP source boundary/],
+  ['runtime platform version pins SDK patch', 'references/source-and-manifest.md',
+    'not an SDK patch/build',
+    'prefer an exact SDK patch/build', /manifest runtime version shape/],
+  ['ignore rules filter existing archives', 'references/deployment.md',
+    'These filters do not scan for secrets and never apply to an existing ZIP uploaded unchanged',
+    'These filters remove secrets from every archive', /ZIP archive filter boundary/],
   ['identity save assumed to deploy', 'references/model-services.md',
     'identity-only PATCH saves assignments without deployment',
     'identity PATCH deploys automatically', /identity deployment boundary/],
@@ -392,7 +437,7 @@ const unsafeGuidance = [
   ['confusing discovery refresh with installation coverage', 'references/prerequisites.md',
     'Refresh accounts and repositories', 'Refresh nothing', /distinct GitHub refresh actions/],
   ['hiding uploaded secrets behind gitignore', 'references/deployment.md',
-    'does not apply `.gitignore` or automatically exclude `.env`',
+    'older published clients do not honor ignore files',
     'automatically excludes all secrets using .gitignore', /ZIP upload contents review/],
   ['wrong ZIP manifest size contract', 'references/deployment.md',
     '**100 MiB**', '**200 MiB**', /ZIP manifest and size contract/],

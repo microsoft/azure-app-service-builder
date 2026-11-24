@@ -1,6 +1,6 @@
 # Getting started with App Service Builder
 
-> **Preview guide - updated November 14, 2026.**
+> **Preview guide - updated November 24, 2026.**
 > App Service Builder is open to everyone with an Azure subscription during preview,
 > subject to usage limits and regional availability. No invitation is required.
 
@@ -154,7 +154,10 @@ only for GitHub source operations, not local-directory/ZIP deployment.
    Local-directory/ZIP deployment does not require GitHub sign-in or installation
    of the GitHub App. It uploads source to build, not a ready-to-run package;
    when providing your own `builder.yaml`, include it at the selected source root.
-   Exclude secrets from the upload.
+   Exclude secrets from the upload. Newer CLI directory packaging honors
+   `.gitignore` and `.builderignore`, but older published archives may not.
+   Review actual included files; ignore patterns are not secret scanning and
+   do not modify an existing ZIP.
 
 The same CLI archive works on Windows, macOS, and Linux. A separate .NET 10
 runtime is needed **only for optional local manifest commands**, not for login,
@@ -392,7 +395,7 @@ your project:
 | Deploy GitHub changes automatically | New GitHub connections enable [automatic deployments](https://builder.appservice.azure.com/docs/guides/source-control/#automatic-deployment-policy) by default. Review the policy or opt out, then verify the deployed revision and app URL. |
 | Connect an existing service | Use **Overview/Architecture → Add connection** and the [Connections workflow](../plugin/skills/app-service-builder/references/model-services.md#explain-the-supported-path-first) first for supported profiles. |
 | Protect visitor access | Configure [visitor authentication](https://builder.appservice.azure.com/docs/guides/authentication/), separately from service identity. |
-| Control the deployed app | Use [Start/Stop](https://builder.appservice.azure.com/docs/guides/deployments/#stop-and-start-compute) and [Portal Log stream](https://builder.appservice.azure.com/docs/guides/logging-and-monitoring/) with the exact app and permissions. |
+| Control and diagnose the deployed app | Use [Start/Stop](https://builder.appservice.azure.com/docs/guides/deployments/#stop-and-start-compute), multi-replica logs, or separately approved root-level [Console/exec](https://builder.appservice.azure.com/docs/guides/logging-and-monitoring/#console-and-command-execution) with the exact app and permissions. |
 
 Check [current feature availability](https://builder.appservice.azure.com/docs/resources/feature-status/)
 before choosing a workflow. GitHub source connections now default to automatic
@@ -401,14 +404,25 @@ The Portal's separate **Use GitHub Actions** integration remains
 **Coming soon**. Follow the published guide for each capability rather than
 assuming a CLI flag or saved setting proves availability.
 
-Connections is the recommended service-configuration experience for supported
-profiles. Managed-identity Blob Storage, Foundry inference and PostgreSQL delivery
-is qualified; expanded profiles, protected modes and CLI release qualification
-retain separate pending boundaries. Map names to the actual app SDK and use
-Connections rather than manual Variables for runtime-only settings. Saving a
-connection or selecting an identity neither grants access nor deploys/tests it.
-Complete the app-wide identity assignment, approve destination access, deploy
-the intended snapshot, and verify a real dependency operation.
+Check the current supported Connections service list first. Prefer Connections
+when the service is listed; otherwise use the service's standard SDK/API
+connection method and documented configuration. A failed lookup is not proof
+the service is absent. The catalog exposes eleven profiles; configuration
+availability is not service-access proof.
+Operation evidence covers managed-identity Blob Storage, Foundry, PostgreSQL and
+bounded Application Insights ingestion, not every sample or protected mode.
+The current CLI includes typed `connections add <service>` / `update <service>`.
+Review identity-assignment and possible missing-key acquisition effects before
+choosing authentication; prefer explicit managed identity. Map names to the
+actual app SDK and keep endpoint settings in Connections, not manual Variables.
+Complete assignment, approve destination access, deploy the intended snapshot
+and verify a real dependency operation. Manual variables alone do not register
+an Architecture connection node.
+
+Newer targets/clients can reuse retained active ZIP source for configuration
+changes. Check installed help for `--active-source`; it rebuilds that source
+with current desired settings, not local edits or a historical version snapshot.
+Do not let a connected GitHub repository silently replace intended ZIP source.
 Visitor sign-in is separate from Azure management and GitHub source access.
 
 ## Feedback and support
