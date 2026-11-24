@@ -139,6 +139,8 @@ function checkGuidance(skillRoot) {
     ['references/operations.md', /Replica admission counts configured maxima and in-flight increases/i, 'replica allowance accounting'],
     ['references/operations.md', /acceptance is not completed teardown or artifact cleanup/i, 'asynchronous deletion evidence'],
     ['SKILL.md', /recommend Builder Connections first[^]*not manual Variables/i, 'Connections first routing'],
+    ['SKILL.md', /check the current supported Connections service list first[^]*If the service is not listed, proceed with its standard SDK\/API connection method/i, 'Connections support-first fallback'],
+    ['references/model-services.md', /Check the current supported Connections service list first[^]*If the service is not listed, proceed with its standard SDK\/API connection method[^]*failed catalog lookup is not proof of absence/i, 'Connections catalog lookup boundary'],
     ['references/model-services.md', /Recommend Builder Connections first[^]*Catalog presence or successful direct-variable service tests do not qualify named delivery/i, 'connection configuration qualification'],
     ['references/model-services.md', /connection save itself does not assign or remove identities[^]*Typed CLI setup can separately enable\/attach/i, 'connection identity separation'],
     ['references/model-services.md', /Never put API keys, passwords, protected connection strings, or tokens in connection JSON/i, 'connection credential privacy'],

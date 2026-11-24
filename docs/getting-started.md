@@ -404,8 +404,11 @@ The Portal's separate **Use GitHub Actions** integration remains
 **Coming soon**. Follow the published guide for each capability rather than
 assuming a CLI flag or saved setting proves availability.
 
-Connections is the recommended service-configuration experience. Its catalog
-exposes eleven profiles; configuration availability is not service-access proof.
+Check the current supported Connections service list first. Prefer Connections
+when the service is listed; otherwise use the service's standard SDK/API
+connection method and documented configuration. A failed lookup is not proof
+the service is absent. The catalog exposes eleven profiles; configuration
+availability is not service-access proof.
 Operation evidence covers managed-identity Blob Storage, Foundry, PostgreSQL and
 bounded Application Insights ingestion, not every sample or protected mode.
 The current CLI includes typed `connections add <service>` / `update <service>`.
